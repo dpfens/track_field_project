@@ -133,6 +133,9 @@ class Identity(models.Model):
         db_table = 'identity'
         unique_together = (('organization', 'identifier'),)
 
+    def __str__(self):
+        return self.identifier
+
 
 class IdentityAttribute(models.Model):
     identity = models.ForeignKey(Identity, models.DO_NOTHING)

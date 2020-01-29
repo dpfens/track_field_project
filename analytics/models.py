@@ -326,10 +326,10 @@ class RequestHeader(models.Model):
         db_table = 'analytics_request_header'
 
     def __repr__(self):
-        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
+        return '<%s %s type=%r, name=%r>' % (self.__class__.__name__, id(self), self.type, self.name)
 
     def __str__(self):
-        return str(self.name)
+        return self.name
 
 
 class RequestHeaderValue(models.Model):
