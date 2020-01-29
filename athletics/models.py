@@ -15,7 +15,6 @@ class Annotation(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'annotation'
 
 
@@ -29,7 +28,6 @@ class AnnotationAttempt(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'annotation_attempt'
 
 
@@ -46,7 +44,6 @@ class AnnotationSplit(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'annotation_split'
 
 
@@ -60,7 +57,6 @@ class AnnotationType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'annotation_type'
 
 
@@ -76,43 +72,8 @@ class AnnotationVote(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'annotation_vote'
         unique_together = (('annotation', 'identity', 'up', 'down'),)
-
-
-class AthleteClustering(models.Model):
-    clustering_id = models.PositiveIntegerField(primary_key=True)
-    identity_id = models.PositiveIntegerField()
-    division_id = models.PositiveSmallIntegerField(blank=True, null=True)
-    discipline_id = models.PositiveIntegerField(blank=True, null=True)
-    event_id = models.PositiveIntegerField(blank=True, null=True)
-    start_date = models.DateField(blank=True, null=True)
-    end_date = models.DateField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'athlete_clustering'
-
-
-class AthleteClusteringAssignment(models.Model):
-    clustering = models.ForeignKey(AthleteClustering, models.DO_NOTHING)
-    identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    cluster = models.IntegerField()
-    membership = models.DecimalField(max_digits=4, decimal_places=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'athlete_clustering_assignment'
-        unique_together = (('clustering', 'identity', 'cluster'),)
 
 
 class Attempt(models.Model):
@@ -129,7 +90,6 @@ class Attempt(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'attempt'
 
 
@@ -142,7 +102,6 @@ class AttemptSequential(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'attempt_sequential'
         unique_together = (('attempt', 'sequence'),)
 
@@ -157,7 +116,6 @@ class AttemptThreshold(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'attempt_threshold'
         unique_together = (('attempt_id', 'sequence'),)
 
@@ -172,7 +130,6 @@ class Category(models.Model):
     source = models.CharField(max_length=255)
 
     class Meta:
-        managed = False
         db_table = 'category'
 
 
@@ -186,7 +143,6 @@ class CategoryHierarchy(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'category_hierarchy'
         unique_together = (('parent', 'child'),)
 
@@ -201,7 +157,6 @@ class CategoryMeet(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'category_meet'
         unique_together = (('meet', 'category'),)
 
@@ -218,7 +173,6 @@ class Coach(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'coach'
 
 
@@ -236,7 +190,6 @@ class Comment(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'comment'
 
 
@@ -265,7 +218,6 @@ class Competition(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'competition'
 
 
@@ -279,7 +231,6 @@ class CompetitionSimilarity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'competition_similarity'
         unique_together = (('competition', 'other'),)
 
@@ -295,7 +246,6 @@ class Course(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'course'
 
 
@@ -313,7 +263,6 @@ class CourseSegment(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'course_segment'
         unique_together = (('course', 'sequence'),)
 
@@ -328,7 +277,6 @@ class CourseSimilarity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'course_similarity'
         unique_together = (('course', 'other'),)
 
@@ -344,7 +292,6 @@ class Discipline(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'discipline'
 
 
@@ -359,7 +306,6 @@ class Disqualification(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'disqualification'
         unique_together = (('organization', 'code'),)
 
@@ -375,7 +321,6 @@ class Division(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'division'
 
 
@@ -389,7 +334,6 @@ class Environment(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'environment'
 
 
@@ -405,7 +349,6 @@ class Event(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'event'
 
 
@@ -419,7 +362,6 @@ class EventDistance(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_event_distances')
 
     class Meta:
-        managed = False
         db_table = 'event_distance'
 
 
@@ -433,7 +375,6 @@ class EventHurdles(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'event_hurdles'
 
 
@@ -447,7 +388,6 @@ class EventWeight(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'event_weight'
 
 
@@ -464,7 +404,6 @@ class Heat(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'heat'
         unique_together = (('competition', 'tier', 'name'),)
 
@@ -484,7 +423,6 @@ class HeatClustering(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'heat_clustering'
         unique_together = (('heat', 'id', 'min_eps', 'min_points', 'max_eps', 'max_points', 'fuzzy'),)
 
@@ -501,7 +439,6 @@ class HeatClusteringAssignments(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'heat_clustering_assignments'
         unique_together = (('clustering', 'performance', 'cluster'),)
 
@@ -516,7 +453,6 @@ class HeatSimilarity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'heat_similarity'
         unique_together = (('heat', 'other'),)
 
@@ -531,7 +467,6 @@ class Legitimacies(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'legitimacies'
 
 
@@ -554,7 +489,6 @@ class Meet(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'meet'
 
 
@@ -579,7 +513,6 @@ class MeetInstance(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'meet_instance'
 
 
@@ -592,7 +525,6 @@ class MeetInstanceReview(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
 
     class Meta:
-        managed = False
         db_table = 'meet_instance_review'
         unique_together = (('meet_instance', 'review'),)
 
@@ -607,7 +539,6 @@ class MeetType(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'meet_type'
 
 
@@ -621,7 +552,6 @@ class Mode(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'mode'
 
 
@@ -636,7 +566,6 @@ class OrganizationMembership(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'organization_membership'
         unique_together = (('organization', 'member'),)
 
@@ -663,7 +592,6 @@ class Performance(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'performance'
         unique_together = (('heat', 'organization', 'identity', 'squad', 'value', 'state'),)
 
@@ -680,7 +608,6 @@ class PerformanceAnnotation(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'performance_annotation'
 
 
@@ -694,7 +621,6 @@ class PerformanceSimilarity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'performance_similarity'
         unique_together = (('performance', 'other'),)
 
@@ -710,7 +636,6 @@ class PerformanceState(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'performance_state'
 
 
@@ -725,7 +650,6 @@ class RelayMembers(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'relay_members'
         unique_together = (('relay', 'identity'),)
 
@@ -747,7 +671,6 @@ class RelaySplit(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'relay_split'
         unique_together = (('performance', 'identity'),)
 
@@ -763,7 +686,6 @@ class Review(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'review'
 
 
@@ -777,7 +699,6 @@ class ReviewFlag(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'review_flag'
         unique_together = (('user', 'review'),)
 
@@ -799,7 +720,6 @@ class Rule(models.Model):
     last_updated_by = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'rule'
 
 
@@ -816,7 +736,6 @@ class Sanctions(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'sanctions'
 
 
@@ -833,7 +752,6 @@ class Seed(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'seed'
         unique_together = (('competition', 'identity', 'seed_method', 'seed_source_id'),)
 
@@ -848,7 +766,6 @@ class SeedMethod(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'seed_method'
 
 
@@ -862,7 +779,6 @@ class Series(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'series'
 
 
@@ -876,7 +792,6 @@ class SeriesHierarchy(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'series_hierarchy'
         unique_together = (('parent', 'child'),)
 
@@ -891,7 +806,6 @@ class SeriesMeet(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'series_meet'
         unique_together = (('series', 'meet'),)
 
@@ -907,7 +821,6 @@ class SocialClass(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'social_class'
 
 
@@ -921,7 +834,6 @@ class SocialClassAlias(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_social_class_aliases')
 
     class Meta:
-        managed = False
         db_table = 'social_class_alias'
         unique_together = (('social_class', 'value'),)
 
@@ -939,7 +851,6 @@ class Split(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'split'
 
 
@@ -956,7 +867,6 @@ class SponsorshipAthlete(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'sponsorship_athlete'
 
 
@@ -973,7 +883,6 @@ class SponsorshipCompetition(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'sponsorship_competition'
 
 
@@ -990,7 +899,6 @@ class Sport(models.Model):
     knowledge_graph = models.OneToOneField('utility.KnowledgeGraph', on_delete=models.DO_NOTHING, unique=True, blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'sport'
 
 
@@ -1004,7 +912,6 @@ class SportType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'sport_type'
 
 
@@ -1022,7 +929,6 @@ class StagingAttempt(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'staging_attempt'
 
 
@@ -1035,7 +941,6 @@ class StagingAttemptSequential(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'staging_attempt_sequential'
         unique_together = (('attempt', 'sequence'),)
 
@@ -1050,7 +955,6 @@ class StagingAttemptThreshold(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'staging_attempt_threshold'
         unique_together = (('attempt', 'sequence'),)
 
@@ -1072,7 +976,6 @@ class StagingCompetition(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'staging_competition'
 
 
@@ -1089,7 +992,6 @@ class StagingEntity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'staging_entity'
 
 
@@ -1106,7 +1008,6 @@ class StagingHeat(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'staging_heat'
         unique_together = (('staging_competition', 'staging_tier', 'name'),)
 
@@ -1124,7 +1025,6 @@ class StagingMeet(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'staging_meet'
 
 
@@ -1143,7 +1043,6 @@ class StagingMeetInstance(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'staging_meet_instance'
 
 
@@ -1169,7 +1068,6 @@ class StagingPerformance(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'staging_performance'
         unique_together = (('staging_heat', 'staging_organization_id', 'staging_identity_id', 'squad', 'value', 'state'),)
 
@@ -1184,7 +1082,6 @@ class StagingRelayMembers(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'staging_relay_members'
         unique_together = (('staging_relay', 'staging_identity'),)
 
@@ -1206,7 +1103,6 @@ class StagingRelaySplit(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'staging_relay_split'
         unique_together = (('staging_performance', 'staging_identity'),)
 
@@ -1228,7 +1124,6 @@ class StagingVenue(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'staging_venue'
 
 
@@ -1242,7 +1137,6 @@ class Strategy(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'strategy'
 
 
@@ -1258,7 +1152,6 @@ class Substances(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'substances'
 
 
@@ -1274,7 +1167,6 @@ class Tier(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'tier'
 
 
@@ -1288,5 +1180,4 @@ class TimingSystem(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'timing_system'

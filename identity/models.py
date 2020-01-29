@@ -12,7 +12,6 @@ class Attribute(models.Model):
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'attribute'
 
 
@@ -29,7 +28,6 @@ class Entity(models.Model):
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'entity'
 
 
@@ -44,7 +42,6 @@ class EntityAlias(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'entity_alias'
 
 
@@ -61,7 +58,6 @@ class EntityAttribute(models.Model):
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'entity_attribute'
         unique_together = (('entity', 'attribute'),)
 
@@ -76,7 +72,6 @@ class EntityIdentity(models.Model):
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'entity_identity'
         unique_together = (('entity', 'identity'),)
 
@@ -92,7 +87,6 @@ class EntityTrait(models.Model):
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'entity_trait'
         unique_together = (('entity', 'trait'),)
 
@@ -108,7 +102,6 @@ class EntityType(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'entity_type'
 
 
@@ -122,7 +115,6 @@ class Gender(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'gender'
 
 
@@ -138,7 +130,6 @@ class Identity(models.Model):
     last_modified_by = models.ForeignKey('self', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'identity'
         unique_together = (('organization', 'identifier'),)
 
@@ -156,7 +147,6 @@ class IdentityAttribute(models.Model):
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'identity_attribute'
         unique_together = (('identity', 'attribute'),)
 
@@ -169,7 +159,6 @@ class IdentityCitizenship(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'identity_citizenship'
         unique_together = (('identity', 'country'),)
 
@@ -187,7 +176,6 @@ class IdentityOrganization(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'identity_organization'
         unique_together = (('identity', 'organization_type', 'headquarters_location'),)
 
@@ -209,7 +197,6 @@ class IdentityPerson(models.Model):
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'identity_person'
 
 
@@ -224,7 +211,6 @@ class IdentityTrait(models.Model):
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'identity_trait'
         unique_together = (('identity', 'trait'),)
 
@@ -239,7 +225,6 @@ class IdentityType(models.Model):
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'identity_type'
 
 
@@ -253,7 +238,6 @@ class OrganizationType(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'organization_type'
 
 
@@ -267,7 +251,6 @@ class Trait(models.Model):
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'trait'
 
 
@@ -282,7 +265,6 @@ class StagingIdentity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'staging_identity'
         unique_together = (('organization', 'identifier'),)
 
@@ -300,7 +282,6 @@ class StagingIdentityOrganization(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'staging_identity_organization'
         unique_together = (('staging_identity', 'organization_type', 'headquarters_location'),)
 
@@ -322,5 +303,4 @@ class StagingIdentityPerson(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'staging_identity_person'

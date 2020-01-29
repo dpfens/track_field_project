@@ -18,7 +18,6 @@ class Address(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'address'
 
 
@@ -33,7 +32,6 @@ class AddressComponent(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
 
     class Meta:
-        managed = False
         db_table = 'address_component'
 
 
@@ -47,7 +45,6 @@ class AddressComponentType(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'address_component_type'
 
 
@@ -60,7 +57,6 @@ class Amenity(models.Model):
     last_modified_by = models.PositiveIntegerField()
 
     class Meta:
-        managed = False
         db_table = 'amenity'
 
 
@@ -75,7 +71,6 @@ class Continent(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
 
     class Meta:
-        managed = False
         db_table = 'continent'
 
 
@@ -104,7 +99,6 @@ class Country(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
 
     class Meta:
-        managed = False
         db_table = 'country'
 
 
@@ -118,7 +112,6 @@ class CountryCodes(models.Model):
     end_date = models.DateField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'country_codes'
 
 
@@ -131,7 +124,6 @@ class CountryCurrency(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_country_currencies')
 
     class Meta:
-        managed = False
         db_table = 'country_currency'
         unique_together = (('country', 'currency'),)
 
@@ -146,7 +138,6 @@ class Currency(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='modified_currencies')
 
     class Meta:
-        managed = False
         db_table = 'currency'
 
 
@@ -162,7 +153,6 @@ class Language(models.Model):
     last_modified_by = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'language'
 
 
@@ -177,7 +167,6 @@ class LanguageVariant(models.Model):
     last_modified_by = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'language_variant'
 
 
@@ -195,7 +184,6 @@ class Location(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'location'
 
 
@@ -208,7 +196,6 @@ class LocationAddress(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'location_address'
         unique_together = (('address_component', 'location'),)
 
@@ -223,7 +210,6 @@ class LocationType(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'location_type'
 
 
@@ -236,7 +222,6 @@ class LocationTypes(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'location_types'
         unique_together = (('location_type', 'location'),)
 
@@ -251,7 +236,6 @@ class Terrain(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'terrain'
 
 
@@ -265,7 +249,6 @@ class Venue(models.Model):
     source = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
         db_table = 'venue'
 
 
@@ -280,7 +263,6 @@ class VenueAmenities(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
 
     class Meta:
-        managed = False
         db_table = 'venue_amenities'
         unique_together = (('venue', 'amenity'),)
 
@@ -296,7 +278,6 @@ class VenueLocations(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'venue_locations'
         unique_together = (('venue', 'location'),)
 
@@ -311,7 +292,6 @@ class VenueType(models.Model):
     source = models.CharField(max_length=25)
 
     class Meta:
-        managed = False
         db_table = 'venue_type'
 
 
@@ -324,7 +304,6 @@ class VenueTypes(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'venue_types'
         unique_together = (('venue_type', 'venue'),)
 
@@ -342,6 +321,5 @@ class Weather(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'weather'
         unique_together = (('location', 'date', 'source'),)
