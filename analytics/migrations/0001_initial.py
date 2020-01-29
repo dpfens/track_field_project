@@ -25,12 +25,25 @@ class Migration(migrations.Migration):
                 instance = analytics.models.RequestType(name=name, description='', created_by=superuser_identity)
                 instance.save()
 
+    def create_header_types(apps, schema_editor):
+        superusers = User.objects.filter(is_superuser=True).all()
+        superuser = superusers[0]
+        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
+
+        types = ['Authentication', 'Caching', 'Client Hints', 'Conditionals', 'Connection Management', 'Content Negotiation', 'Controls', 'Cookies', 'CORS', 'Do Not Track', 'Downloads', 'Message Body Information', 'Proxies', 'Redirects', 'Request Context', 'Response Context', 'Range Requests', 'Security', 'Server-Sent Events', 'Transfer Coding', 'Websockets', 'Other']
+        for name in types:
+            try:
+                request_header_type = analytics.models.RequestHeaderType.objects.get(name=name)
+            except Exception:
+                request_header_type = analytics.models.RequestHeaderType(name=name, created_by=superuser_identity)
+                request_header_type.save()
+
     def create_methods(apps, schema_editor):
         superusers = User.objects.filter(is_superuser=True).all()
         superuser = superusers[0]
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
-        methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+        methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'CONNECT', 'OPTIONS', 'TRACE']
         for method in methods:
             try:
                 request_method = analytics.models.RequestMethod.objects.get(name=method)
@@ -58,7 +71,7 @@ class Migration(migrations.Migration):
         superuser = superusers[0]
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
-        types = ['PC', 'Tablet', 'Mobile', 'Bot']
+        types = ['PC', 'Tablet', 'Mobile', 'TV', 'Bot']
         for name in types:
             try:
                 instance = analytics.models.DeviceType.objects.get(name=name)
@@ -69,6 +82,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(create_request_types),
+        migrations.RunPython(create_header_types),
         migrations.RunPython(create_methods),
         migrations.RunPython(create_ip_address_types),
         migrations.RunPython(create_device_types),

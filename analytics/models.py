@@ -254,7 +254,19 @@ class Request(models.Model):
         db_table = 'analytics_request'
 
 
+class RequestHeaderType(models.Model):
+    name = models.CharField(unique=True, max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_header_types')
+    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, null=True, blank=True, db_column='last_modified_by', related_name='modified_header_types')
+
+    class Meta:
+        db_table = 'analytics_request_header_type'
+
+
 class RequestHeader(models.Model):
+    type = models.ForeignKey(RequestHeaderType, on_delete=models.DO_NOTHING)
     name = models.CharField(unique=True, max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_headers')

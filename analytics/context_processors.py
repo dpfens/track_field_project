@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 def log_request(request):
     if not request.identity:
-        logger.warning('Test: request %r does not have an identity', request)
         return
     now = datetime.now()
 
@@ -170,7 +169,8 @@ def log_request(request):
         try:
             request_header = models.RequestHeader.objects.get(name=header_name)
         except Exception:
-            request_header = models.RequestHeader(name=header_name, created_by=request.identity)
+            request_header_type = models.RequestHeaderType.get(name='Other')
+            request_header = models.RequestHeader(type=request_header_type, name=header_name, created_by=request.identity)
             request_header.save()
 
         try:
