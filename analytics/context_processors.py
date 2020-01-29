@@ -58,27 +58,29 @@ def log_request(request):
     # fetch/add Device
     device = request.user_agent.device
     device_family = device.family
+
+    if request.user_agent.is_mobile:
+        device_type = 'Mobile'
+    elif request.user_agent.is_tablet:
+        device_type = 'Tablet'
+    elif request.user_agent.is_pc:
+        device_type = 'PC'
+    elif request.user_agent.is_bot:
+        device_type = 'Bot'
+    else:
+        device_type = 'Unknown'
+
     try:
-        device = models.Device.objects.get(name=device_family)
+        device_type = models.DeviceType.objects.get(name=device_type)
+    except Exception as e:
+        logger.warning('%r is not a known device Type: %r', user_agent, e)
+        device_type = models.DeviceType(name=device_family, description='', created_by=request.identity)
+        device_type.save()
+
+    try:
+        device = models.Device.objects.get(device_type=device_type, name=device_family)
     except Exception as e:
         logger.warning('%r is not a known device_family: %r', device_family, e)
-        if request.user_agent.is_mobile:
-            device_type = 'Mobile'
-        elif request.user_agent.is_tablet:
-            device_type = 'Tablet'
-        elif request.user_agent.is_pc:
-            device_type = 'PC'
-        elif request.user_agent.is_bot:
-            device_type = 'Bot'
-        else:
-            device_type = 'Unknown'
-
-        try:
-            device_type = models.DeviceType.objects.get(name=device_family)
-        except Exception as e:
-            logger.warning('%r is not a known device Type: %r', user_agent, e)
-            device_type = models.DeviceType(name=device_family, description='', created_by=request.identity)
-            device_type.save()
         device = models.Device(device_type=device_type, name=device_family, created_by=request.identity)
         device.save()
 
@@ -112,7 +114,7 @@ def log_request(request):
         url.save()
 
     # fetch/add Referrer
-    raw_referrer = request.META.get('HTTP_REFERRER')
+    raw_referrer = request.META.get('HTTP_REFERER')
     if raw_referrer:
         try:
             referrer = models.Referrer.objects.get(value=raw_referrer)
@@ -126,9 +128,9 @@ def log_request(request):
             except Exception as e:
                 referrer_type = models.ReferrerType(name=raw_referrer_type, created_by=request.identity)
                 referrer_type.save()
-            referrer = models.Referrer(name=raw_referrer, referrer_type=referrer_type, created_by=request.identity)
+            referrer = models.Referrer(value=raw_referrer, referrer_type=referrer_type, created_by=request.identity)
             referrer.save()
-            referrer_id = referrer.id
+        referrer_id = referrer.id
     else:
         referrer_id = None
 
@@ -169,7 +171,7 @@ def log_request(request):
         try:
             request_header = models.RequestHeader.objects.get(name=header_name)
         except Exception:
-            request_header_type = models.RequestHeaderType.get(name='Other')
+            request_header_type = models.RequestHeaderType.objects.get(name='Other')
             request_header = models.RequestHeader(type=request_header_type, name=header_name, created_by=request.identity)
             request_header.save()
 

@@ -135,10 +135,16 @@ class Browser(models.Model):
     class Meta:
         db_table = 'analytics_browser'
 
+    def __repr__(self):
+        return '<%s %s name=%r, version=%r>' % (self.__class__.__name__, id(self), self.name, self.version)
+
+    def __str__(self):
+        return str(self.name)
+
 
 class Device(models.Model):
     device_type = models.ForeignKey('DeviceType', models.DO_NOTHING)
-    manufacturer = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    manufacturer = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True)
     name = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
@@ -148,6 +154,13 @@ class Device(models.Model):
     class Meta:
         db_table = 'analytics_device'
         unique_together = (('device_type', 'manufacturer', 'name'),)
+
+    def __repr__(self):
+
+        return '<%s %s manufacturer=%r, name=%r>' % (self.__class__.__name__, id(self), self.manufacturer, self.name)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class DeviceType(models.Model):
@@ -161,6 +174,12 @@ class DeviceType(models.Model):
 
     class Meta:
         db_table = 'analytics_device_type'
+
+    def __repr__(self):
+        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class IpAddress(models.Model):
@@ -187,6 +206,12 @@ class IpAddressType(models.Model):
     class Meta:
         db_table = 'analytics_ip_address_type'
 
+    def __repr__(self):
+        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
+
+    def __str__(self):
+        return str(self.name)
+
 
 class OperatingSystem(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
@@ -206,6 +231,18 @@ class OperatingSystem(models.Model):
         db_table = 'analytics_operating_system'
         unique_together = (('manufacturer', 'name'),)
 
+    def __repr__(self):
+        return '<%s %s manufacturer=%r, name=%r, version=%r>' % (self.__class__.__name__, id(self), self.manufacturer, self.name, self.version)
+
+    def __str__(self):
+        output = ''
+        if self.manufacturer:
+            output += self.manufacturer + ' '
+        output += self.name
+        if self.version:
+            output += ' version: %r' % self.version
+        return output
+
 
 class Referrer(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -213,8 +250,8 @@ class Referrer(models.Model):
     value = models.CharField(max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField()
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
+    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
         db_table = 'analytics_referrer'
@@ -225,12 +262,18 @@ class ReferrerType(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.PositiveIntegerField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.PositiveIntegerField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
         db_table = 'analytics_referrer_type'
+
+    def __repr__(self):
+        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Request(models.Model):
@@ -264,6 +307,12 @@ class RequestHeaderType(models.Model):
     class Meta:
         db_table = 'analytics_request_header_type'
 
+    def __repr__(self):
+        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
+
+    def __str__(self):
+        return str(self.name)
+
 
 class RequestHeader(models.Model):
     type = models.ForeignKey(RequestHeaderType, on_delete=models.DO_NOTHING)
@@ -275,6 +324,12 @@ class RequestHeader(models.Model):
 
     class Meta:
         db_table = 'analytics_request_header'
+
+    def __repr__(self):
+        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class RequestHeaderValue(models.Model):
@@ -310,6 +365,12 @@ class RequestMethod(models.Model):
     class Meta:
         db_table = 'analytics_request_method'
 
+    def __repr__(self):
+        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
+
+    def __str__(self):
+        return str(self.name)
+
 
 class RequestType(models.Model):
     name = models.CharField(unique=True, max_length=25)
@@ -321,6 +382,12 @@ class RequestType(models.Model):
 
     class Meta:
         db_table = 'analytics_request_type'
+
+    def __repr__(self):
+        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Url(models.Model):
@@ -374,6 +441,12 @@ class UserAgent(models.Model):
 
     class Meta:
         db_table = 'analytics_user_agent'
+
+    def __repr__(self):
+        return '<%s %s value=%r>' % (self.__class__.__name__, id(self), self.value)
+
+    def __str__(self):
+        return str(self.value)
 
 
 class UserLoginArchive(models.Model):

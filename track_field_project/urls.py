@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from track_field_project.admin.site import advanced_admin
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('advanced-admin/', advanced_admin.urls)
 ]
