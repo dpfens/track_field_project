@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         superusers = User.objects.filter(is_superuser=True).all()
         superuser = superusers[0]
         identity = models.Identity.objects.get(user_id=superuser.id)
-        types = ['Person', 'Organization', 'Government', 'Bot']
+        types = ['Person', 'Organization', 'Government', 'Bot', 'Relay']
         for type in types:
             try:
                 models.EntityType.objects.get(name=type)
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 entity_type.save()
 
     def create_identity_types(apps, schema_editor):
-        types = ['Anonymous User', 'User', 'Person', 'Bot']
+        types = ['Anonymous User', 'User', 'Person', 'Bot', 'Relay']
         for type in types:
             try:
                 models.IdentityType.objects.get(name=type)
