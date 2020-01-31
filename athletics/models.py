@@ -1103,6 +1103,22 @@ class StagingRelayMembers(models.Model):
         unique_together = (('staging_relay', 'staging_identity'),)
 
 
+class StagingRelayPerformanceParticipants(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
+    relay = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
+    member = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
+    performance = models.ForeignKey(Performance, models.DO_NOTHING)
+    sequence = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_staging_relay_participants')
+    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_staging_relay_participants')
+
+    class Meta:
+        db_table = 'staging_relay_performance_participants'
+        unique_together = (('performance', 'relay', 'member'),)
+
+
 class StagingRelaySplit(models.Model):
     staging_performance = models.ForeignKey(StagingPerformance, models.DO_NOTHING)
     staging_identity = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
