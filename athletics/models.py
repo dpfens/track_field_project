@@ -655,6 +655,21 @@ class RelayMembers(models.Model):
         unique_together = (('relay', 'identity'),)
 
 
+class RelayPerformanceParticipants(models.Model):
+    relay = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    member = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    performance = models.ForeignKey(Performance, models.DO_NOTHING)
+    sequence = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_relay_participants')
+    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_relay_participants')
+
+    class Meta:
+        db_table = 'relay_performance_participants'
+        unique_together = (('performance', 'relay', 'member'),)
+
+
 class RelaySplit(models.Model):
     performance = models.ForeignKey(Performance, models.DO_NOTHING)
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
