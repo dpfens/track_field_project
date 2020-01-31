@@ -1,17 +1,18 @@
 from django.db import models
 
 # Create your models here.
+
 class Annotation(models.Model):
     id = models.BigAutoField(primary_key=True)
     annotation_type = models.ForeignKey('AnnotationType', models.DO_NOTHING)
-    is_public = models.PositiveIntegerField()
-    is_verified = models.PositiveIntegerField()
+    is_public = models.BooleanField()
+    is_verified = models.BooleanField()
     verified_by = models.PositiveIntegerField(blank=True, null=True)
     verified_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotations')
     last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotations')
     source = models.CharField(max_length=25)
 
     class Meta:
@@ -19,12 +20,12 @@ class Annotation(models.Model):
 
 
 class AnnotationAttempt(models.Model):
-    attempt_id = models.PositiveIntegerField()
+    attempt = models.ForeignKey('Attempt', models.DO_NOTHING)
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_attempts')
     last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_attempts')
     source = models.CharField(max_length=25)
 
     class Meta:
@@ -32,15 +33,15 @@ class AnnotationAttempt(models.Model):
 
 
 class AnnotationSplit(models.Model):
-    performance_id = models.PositiveIntegerField()
+    performance = models.ForeignKey('Performance', models.DO_NOTHING)
     cumulative_distance = models.DecimalField(max_digits=10, decimal_places=3)
     distance = models.DecimalField(max_digits=10, decimal_places=3)
     cumulative_time = models.DecimalField(max_digits=10, decimal_places=3)
     time = models.DecimalField(max_digits=10, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_splits')
     last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_splits')
     source = models.CharField(max_length=25)
 
     class Meta:
@@ -52,9 +53,9 @@ class AnnotationType(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_types')
     last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_types')
 
     class Meta:
         db_table = 'annotation_type'
@@ -64,12 +65,12 @@ class AnnotationVote(models.Model):
     id = models.BigAutoField(primary_key=True)
     annotation = models.ForeignKey(Annotation, models.DO_NOTHING)
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    up = models.PositiveIntegerField()
-    down = models.PositiveIntegerField()
+    up = models.BooleanField()
+    down = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_votes')
     last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_votes')
 
     class Meta:
         db_table = 'annotation_vote'
@@ -77,16 +78,16 @@ class AnnotationVote(models.Model):
 
 
 class Attempt(models.Model):
-    identity_id = models.PositiveIntegerField()
-    heat_id = models.PositiveIntegerField()
-    performance_id = models.PositiveIntegerField()
-    state_id = models.PositiveIntegerField()
+    identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    heat = models.ForeignKey('Heat', models.DO_NOTHING)
+    performance = models.ForeignKey('Performance', models.DO_NOTHING)
+    state = models.ForeignKey('PerformanceState', models.DO_NOTHING)
     value = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     wind = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_attempts')
     last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_attempts')
     source = models.CharField(max_length=25)
 
     class Meta:
@@ -107,7 +108,7 @@ class AttemptSequential(models.Model):
 
 
 class AttemptThreshold(models.Model):
-    attempt_id = models.PositiveIntegerField(primary_key=True)
+    attempt = models.ForeignKey(Attempt, models.DO_NOTHING, primary_key=True)
     sequence = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
@@ -117,7 +118,7 @@ class AttemptThreshold(models.Model):
 
     class Meta:
         db_table = 'attempt_threshold'
-        unique_together = (('attempt_id', 'sequence'),)
+        unique_together = (('attempt', 'sequence'),)
 
 
 class Category(models.Model):
@@ -134,8 +135,8 @@ class Category(models.Model):
 
 
 class CategoryHierarchy(models.Model):
-    parent = models.ForeignKey(Category, models.DO_NOTHING)
-    child = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    parent = models.ForeignKey(Category, models.DO_NOTHING, related_name='parent_category')
+    child = models.ForeignKey(Category, models.DO_NOTHING, related_name='child_category')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified = models.DateTimeField(blank=True, null=True)
@@ -178,7 +179,7 @@ class Coach(models.Model):
 
 class Comment(models.Model):
     id = models.BigAutoField(primary_key=True)
-    reply_to_comment = models.ForeignKey('self', models.DO_NOTHING)
+    reply_to_comment = models.ForeignKey('self', models.DO_NOTHING, null=True)
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     subject = models.CharField(max_length=255)
     content = models.TextField()
@@ -199,7 +200,7 @@ class Competition(models.Model):
     event = models.ForeignKey('Event', models.DO_NOTHING)
     subevent = models.ForeignKey('Event', models.DO_NOTHING, related_name='multi_events', blank=True, null=True)
     mode = models.ForeignKey('Mode', models.DO_NOTHING, blank=True, null=True)
-    course_id = models.PositiveIntegerField(blank=True, null=True)
+    course = models.ForeignKey('Course', models.DO_NOTHING, blank=True, null=True)
     expected_start = models.DateTimeField(blank=True, null=True)
     actual_start = models.DateTimeField(blank=True, null=True)
     name = models.CharField(max_length=255)
@@ -222,7 +223,7 @@ class Competition(models.Model):
 
 
 class CompetitionSimilarity(models.Model):
-    competition = models.OneToOneField(Competition, on_delete=models.DO_NOTHING)
+    competition = models.ForeignKey(Competition, on_delete=models.DO_NOTHING)
     other = models.ForeignKey(Competition, models.DO_NOTHING, related_name='%(class)s_other')
     value = models.DecimalField(max_digits=4, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -676,7 +677,7 @@ class RelaySplit(models.Model):
 
 
 class Review(models.Model):
-    user_id = models.PositiveIntegerField()
+    user = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     rating = models.DecimalField(max_digits=2, decimal_places=1)
     content_language = models.ForeignKey('geography.Language', models.DO_NOTHING)
     content = models.TextField()
