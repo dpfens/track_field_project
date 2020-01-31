@@ -656,6 +656,7 @@ class RelayMembers(models.Model):
 
 
 class RelayPerformanceParticipants(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
     relay = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     member = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     performance = models.ForeignKey(Performance, models.DO_NOTHING)
