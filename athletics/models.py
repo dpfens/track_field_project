@@ -657,8 +657,8 @@ class RelayMembers(models.Model):
 
 class RelayPerformanceParticipants(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
-    relay = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    member = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    relay = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_participants_relays')
+    member = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_participants')
     performance = models.ForeignKey(Performance, models.DO_NOTHING)
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -1105,8 +1105,8 @@ class StagingRelayMembers(models.Model):
 
 class StagingRelayPerformanceParticipants(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
-    relay = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
-    member = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
+    relay = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relay_participants_relays')
+    member = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relay_participants_members')
     performance = models.ForeignKey(Performance, models.DO_NOTHING)
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
