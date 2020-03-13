@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 
+
 class Annotation(models.Model):
     id = models.BigAutoField(primary_key=True)
     annotation_type = models.ForeignKey('AnnotationType', models.DO_NOTHING)
@@ -108,7 +109,7 @@ class AttemptSequential(models.Model):
 
 
 class AttemptThreshold(models.Model):
-    attempt = models.ForeignKey(Attempt, models.DO_NOTHING, primary_key=True)
+    attempt = models.OneToOneField(Attempt, on_delete=models.DO_NOTHING)
     sequence = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
@@ -658,13 +659,13 @@ class RelayMembers(models.Model):
 class RelayPerformanceParticipants(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     relay = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    member = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    member = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_memberships')
     performance = models.ForeignKey(Performance, models.DO_NOTHING)
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_relay_participants')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_relay_participant_performance')
     last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_relay_participants')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_relay_participant_performance')
 
     class Meta:
         db_table = 'relay_performance_participants'
@@ -1090,8 +1091,8 @@ class StagingPerformance(models.Model):
 
 
 class StagingRelayMembers(models.Model):
-    staging_relay = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='%(class)s_relay')
-    staging_identity = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='%(class)s_identity')
+    staging_relay = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relays')
+    staging_identity = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relay_memberships')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified = models.DateTimeField(blank=True, null=True)
@@ -1106,7 +1107,7 @@ class StagingRelayMembers(models.Model):
 class StagingRelayPerformanceParticipants(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     relay = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
-    member = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
+    member = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relay_member_performances')
     performance = models.ForeignKey(Performance, models.DO_NOTHING)
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
