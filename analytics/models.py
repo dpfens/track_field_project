@@ -142,6 +142,33 @@ class Browser(models.Model):
         return str(self.name)
 
 
+class BrowserFeature(models.Model):
+    id = models.PositiveSmallIntegerField(primary_key=True)
+    name = models.CharField(unique=True, max_length=50)
+    description = models.CharField(max_length=250)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browser_features')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_features')
+
+    class Meta:
+        db_table = 'analytics_browser_feature'
+
+
+class BrowserFeatures(models.Model):
+    analytics_browser = models.ForeignKey(Browser, models.DO_NOTHING)
+    analytics_browser_feature = models.ForeignKey(BrowserFeature, models.DO_NOTHING)
+    supported = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browser_feature_instances')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_feature_instances')
+
+    class Meta:
+        db_table = 'analytics_browser_features'
+        unique_together = (('analytics_browser', 'analytics_browser_feature'),)
+
+
 class Device(models.Model):
     device_type = models.ForeignKey('DeviceType', models.DO_NOTHING)
     manufacturer = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True)
@@ -295,6 +322,20 @@ class Request(models.Model):
 
     class Meta:
         db_table = 'analytics_request'
+
+
+class AnalyticsRequestFeature(models.Model):
+    request = models.ForeignKey(Request, models.DO_NOTHING)
+    feature = models.ForeignKey(BrowserFeature, models.DO_NOTHING)
+    supported = models.BooleanField()
+    created_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_browser_features')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_browser_features')
+
+    class Meta:
+        db_table = 'analytics_request_feature'
+        unique_together = (('request', 'feature'),)
 
 
 class RequestHeaderType(models.Model):
