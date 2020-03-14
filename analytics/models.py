@@ -324,11 +324,11 @@ class Request(models.Model):
         db_table = 'analytics_request'
 
 
-class AnalyticsRequestFeature(models.Model):
+class RequestFeature(models.Model):
     request = models.ForeignKey(Request, models.DO_NOTHING)
     feature = models.ForeignKey(BrowserFeature, models.DO_NOTHING)
     supported = models.BooleanField()
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_browser_features')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_browser_features')

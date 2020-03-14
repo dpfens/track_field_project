@@ -64,18 +64,24 @@ class Continent(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
     code = models.CharField(unique=True, max_length=2)
     name = models.CharField(unique=True, max_length=13)
-    geonames_id = models.IntegerField()
+    geonames_id = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'continent'
 
 
 class Country(models.Model):
-    continent = models.ForeignKey(Continent, models.DO_NOTHING)
+    continent = models.ForeignKey(Continent, models.DO_NOTHING, null=True)
     iso = models.CharField(unique=True, max_length=2, blank=True, null=True)
     iso3 = models.CharField(max_length=3, blank=True, null=True)
     iso_numeric = models.IntegerField(blank=True, null=True)
@@ -92,11 +98,14 @@ class Country(models.Model):
     postal_code_format = models.CharField(max_length=55, blank=True, null=True)
     postal_code_regex = models.CharField(max_length=400, blank=True, null=True)
     languages = models.CharField(max_length=200, blank=True, null=True)
-    geonameid = models.IntegerField(blank=True, null=True)
+    geonames_id = models.PositiveIntegerField(blank=True, null=True)
     neighbours = models.CharField(max_length=41, blank=True, null=True)
     equivalent_fips_code = models.CharField(max_length=2, blank=True, null=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
+
+    def __unicode__(self):
+        return self.full_name
 
     class Meta:
         db_table = 'country'
@@ -173,6 +182,7 @@ class LanguageVariant(models.Model):
 class Location(models.Model):
     id = models.BigAutoField(primary_key=True)
     place_id = models.CharField(max_length=300)
+    geonames_id = models.PositiveIntegerField(blank=True, null=True)
     formatted_address = models.CharField(max_length=200)
     latitude = models.DecimalField(max_digits=12, decimal_places=3)
     longitude = models.DecimalField(max_digits=12, decimal_places=3)
