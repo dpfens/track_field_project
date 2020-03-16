@@ -93,7 +93,15 @@ DATABASES = {
         'PASSWORD': 'Speedy31790',
         'HOST': '127.0.0.1',
         'PORT': 3306
-    }
+    },
+    'geonames': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'geonames',
+        'USER': 'root',
+        'PASSWORD': 'Speedy31790',
+        'HOST': '127.0.0.1',
+        'PORT': 3306
+    },
 }
 
 
