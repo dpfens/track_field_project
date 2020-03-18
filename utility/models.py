@@ -12,7 +12,7 @@ class KnowledgeGraph(models.Model):
     wikipedia = models.CharField(max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -28,8 +28,11 @@ class Quantity(models.Model):
     si_unit = models.ForeignKey('Unit', models.DO_NOTHING, related_name='si_quantity')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'quantity'
@@ -44,8 +47,11 @@ class Unit(models.Model):
     wikipedia_url = models.CharField(max_length=150, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'unit'
@@ -59,8 +65,11 @@ class UnitSystem(models.Model):
     wikipedia_url = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'unit_system'

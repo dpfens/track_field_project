@@ -14,7 +14,7 @@ class Address(models.Model):
     country = models.CharField(max_length=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -28,7 +28,7 @@ class AddressComponent(models.Model):
     short_name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField()
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
 
     class Meta:
@@ -40,7 +40,7 @@ class AddressComponentType(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
     source = models.CharField(max_length=25)
 
@@ -53,7 +53,7 @@ class Amenity(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.IntegerField()
-    last_modified = models.DateTimeField()
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.PositiveIntegerField()
 
     class Meta:
@@ -129,7 +129,7 @@ class CountryCurrency(models.Model):
     currency = models.ForeignKey('Currency', models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_country_currencies')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_country_currencies')
 
     class Meta:
@@ -143,7 +143,7 @@ class Currency(models.Model):
     name = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_currencies')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='modified_currencies')
 
     class Meta:
@@ -158,7 +158,7 @@ class Language(models.Model):
     name = models.CharField(max_length=58, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.PositiveIntegerField()
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
@@ -172,7 +172,7 @@ class LanguageVariant(models.Model):
     territory = models.CharField(max_length=3, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.PositiveIntegerField()
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
@@ -189,7 +189,7 @@ class Location(models.Model):
     elevation = models.DecimalField(max_digits=12, decimal_places=5, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
 
@@ -202,7 +202,7 @@ class LocationAddress(models.Model):
     address_component = models.OneToOneField(AddressComponent, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -215,7 +215,7 @@ class LocationType(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -228,7 +228,7 @@ class LocationTypes(models.Model):
     location = models.ForeignKey(Location, models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -241,7 +241,7 @@ class Terrain(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
 
@@ -254,7 +254,7 @@ class Venue(models.Model):
     slug = models.CharField(unique=True, max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
 
@@ -269,7 +269,7 @@ class VenueAmenities(models.Model):
     end = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField()
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
 
     class Meta:
@@ -284,7 +284,7 @@ class VenueLocations(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -297,7 +297,7 @@ class VenueType(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -310,7 +310,7 @@ class VenueTypes(models.Model):
     venue_type = models.ForeignKey(VenueType, models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -327,7 +327,7 @@ class Weather(models.Model):
     source = models.CharField(max_length=25)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:

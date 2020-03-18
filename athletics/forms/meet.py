@@ -1,24 +1,24 @@
 import logging
 from django import forms
-
+from athletics import models
+from geography.models import Venue
 
 logger = logging.getLogger(__name__)
 
 
-class MeetForm(forms.Form):
-    name = forms.CharField()
-    description = forms.CharField(widget=forms.Textarea)
-    meet_type = forms.ModelChoiceField()
-    environment = forms.ModelChoiceField()
-    championship = forms.BooleanField(initial=False)
+class MeetForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Meet
+
+    def __init__(self, *args, **kwargs):
+        super(MeetForm, self).__init__(*args, **kwargs)
 
 
-class MeetInstanceForm(forms.Form):
-    name = forms.CharField()
-    description = forms.CharField(widget=forms.Textarea)
-    venue = forms.ModelChoiceField()
-    timing_system = forms.ModelChoiceField()
-    start_date = forms.DateField()
-    end_date = forms.DateField()
-    data_file = forms.FileField()
-    url = forms.URLField(required=False)
+class MeetInstanceForm(forms.ModelForm):
+
+    class Meta:
+        model = models.MeetInstance
+
+    def __init__(self, *args, **kwargs):
+        super(MeetInstanceForm, self).__init__(*args, **kwargs)

@@ -8,8 +8,11 @@ class Attribute(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'attribute'
@@ -24,8 +27,12 @@ class Entity(models.Model):
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    identities = models.ManyToManyField('Identity', through='EntityIdentity', through_fields=('entity_id', 'identity_id'))
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'entity'
@@ -37,9 +44,12 @@ class EntityAlias(models.Model):
     preferred_indicator = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'entity_alias'
@@ -54,7 +64,7 @@ class EntityAttribute(models.Model):
     end = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -68,7 +78,7 @@ class EntityIdentity(models.Model):
     is_private = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -97,9 +107,12 @@ class EntityType(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'entity_type'
@@ -110,9 +123,12 @@ class Gender(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='gender_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='gender_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'gender'
@@ -126,7 +142,7 @@ class Identity(models.Model):
     is_private = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('self', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by', null=True)
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('self', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -146,7 +162,7 @@ class IdentityAttribute(models.Model):
     end = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -174,7 +190,7 @@ class IdentityOrganization(models.Model):
     dissolution_date = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -196,7 +212,7 @@ class IdentityPerson(models.Model):
     source = models.CharField(max_length=25)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -224,8 +240,11 @@ class IdentityType(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by', null=True)
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'identity_type'
@@ -236,9 +255,12 @@ class OrganizationType(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='organization_type_created_by',)
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='organization_type_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'organization_type'
@@ -250,8 +272,11 @@ class Trait(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'trait'
@@ -264,7 +289,7 @@ class StagingIdentity(models.Model):
     is_private = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -280,7 +305,7 @@ class StagingIdentityOrganization(models.Model):
     dissolution_date = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -302,7 +327,7 @@ class StagingIdentityPerson(models.Model):
     source = models.CharField(max_length=25)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:

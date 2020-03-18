@@ -6,10 +6,10 @@ from athletics import models
 logger = logging.getLogger(__name__)
 
 
-class CompetitionForm(forms.ModelForm):
+class HeatForm(forms.ModelForm):
 
     class Meta:
-        model = models.Competition
+        model = models.Heat
 
     def __init__(self, *args, **kwargs):
-        super(CompetitionForm, self).__init__(*args, **kwargs)
+        super(HeatForm, self).__init__(*args, **kwargs)

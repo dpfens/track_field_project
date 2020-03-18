@@ -6,13 +6,14 @@ from django.db import models
 class Annotation(models.Model):
     id = models.BigAutoField(primary_key=True)
     annotation_type = models.ForeignKey('AnnotationType', models.DO_NOTHING)
+    content = models.TextField()
     is_public = models.BooleanField()
     is_verified = models.BooleanField()
     verified_by = models.PositiveIntegerField(blank=True, null=True)
     verified_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotations')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotations')
     source = models.CharField(max_length=25)
 
@@ -20,17 +21,30 @@ class Annotation(models.Model):
         db_table = 'annotation'
 
 
-class AnnotationAttempt(models.Model):
+class AnnotationAttemptSequential(models.Model):
     attempt = models.ForeignKey('Attempt', models.DO_NOTHING)
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_attempts')
-    last_modified = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_attempts')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_sequential_attempts')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_sequential_attempts')
     source = models.CharField(max_length=25)
 
     class Meta:
-        db_table = 'annotation_attempt'
+        db_table = 'annotation_attempt_sequential'
+
+
+class AnnotationAttemptThreshold(models.Model):
+    attempt = models.ForeignKey('Attempt', models.DO_NOTHING)
+    sequence = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_threshold_attempts')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_threshold_attempts')
+    source = models.CharField(max_length=25)
+
+    class Meta:
+        db_table = 'annotation_attempt_threshold'
 
 
 class AnnotationSplit(models.Model):
@@ -41,7 +55,7 @@ class AnnotationSplit(models.Model):
     time = models.DecimalField(max_digits=10, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_splits')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_splits')
     source = models.CharField(max_length=25)
 
@@ -55,8 +69,11 @@ class AnnotationType(models.Model):
     description = models.CharField(max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_types')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_types')
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'annotation_type'
@@ -70,7 +87,7 @@ class AnnotationVote(models.Model):
     down = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_annotation_votes')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_annotation_votes')
 
     class Meta:
@@ -87,7 +104,7 @@ class Attempt(models.Model):
     wind = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_attempts')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_attempts')
     source = models.CharField(max_length=25)
 
@@ -100,7 +117,7 @@ class AttemptSequential(models.Model):
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -113,7 +130,7 @@ class AttemptThreshold(models.Model):
     sequence = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -127,12 +144,16 @@ class Category(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'category'
+        verbose_name_plural = 'categories'
 
 
 class CategoryHierarchy(models.Model):
@@ -140,7 +161,7 @@ class CategoryHierarchy(models.Model):
     child = models.ForeignKey(Category, models.DO_NOTHING, related_name='child_category')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -151,10 +172,10 @@ class CategoryHierarchy(models.Model):
 
 class CategoryMeet(models.Model):
     category = models.ForeignKey(Category, models.DO_NOTHING)
-    meet = models.OneToOneField('Meet', on_delete=models.DO_NOTHING)
+    meet = models.ForeignKey('Meet', on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -170,7 +191,7 @@ class Coach(models.Model):
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -188,7 +209,7 @@ class Comment(models.Model):
     flagged_by = models.PositiveIntegerField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -216,8 +237,11 @@ class Competition(models.Model):
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'competition'
@@ -229,12 +253,13 @@ class CompetitionSimilarity(models.Model):
     value = models.DecimalField(max_digits=4, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
         db_table = 'competition_similarity'
         unique_together = (('competition', 'other'),)
+        verbose_name_plural = 'competition similarities'
 
 
 class Course(models.Model):
@@ -244,8 +269,11 @@ class Course(models.Model):
     distance = models.DecimalField(max_digits=12, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'course'
@@ -260,7 +288,7 @@ class CourseSegment(models.Model):
     end = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
 
@@ -275,12 +303,13 @@ class CourseSimilarity(models.Model):
     value = models.DecimalField(max_digits=4, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
         db_table = 'course_similarity'
         unique_together = (('course', 'other'),)
+        verbose_name_plural = 'course similaries'
 
 
 class Discipline(models.Model):
@@ -289,9 +318,12 @@ class Discipline(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'discipline'
@@ -304,7 +336,7 @@ class Disqualification(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -318,9 +350,12 @@ class Division(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'division'
@@ -331,9 +366,12 @@ class Environment(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'environment'
@@ -346,9 +384,12 @@ class Event(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'event'
@@ -360,7 +401,7 @@ class EventDistance(models.Model):
     distance_unit = models.ForeignKey('utility.Unit', models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_event_distances')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_event_distances')
 
     class Meta:
@@ -373,11 +414,12 @@ class EventHurdles(models.Model):
     height_unit = models.ForeignKey('utility.Unit', models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
         db_table = 'event_hurdles'
+        verbose_name_plural = 'event hurdles'
 
 
 class EventWeight(models.Model):
@@ -386,7 +428,7 @@ class EventWeight(models.Model):
     weight_unit = models.ForeignKey('utility.Unit', models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -401,9 +443,12 @@ class Heat(models.Model):
     description = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'heat'
@@ -421,7 +466,7 @@ class HeatClustering(models.Model):
     fuzzy = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -437,12 +482,13 @@ class HeatClusteringAssignments(models.Model):
     membership = models.DecimalField(max_digits=4, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
         db_table = 'heat_clustering_assignments'
         unique_together = (('clustering', 'performance', 'cluster'),)
+        verbose_name_plural = 'heat clustering assignments'
 
 
 class HeatSimilarity(models.Model):
@@ -451,12 +497,13 @@ class HeatSimilarity(models.Model):
     value = models.DecimalField(max_digits=4, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
         db_table = 'heat_similarity'
         unique_together = (('heat', 'other'),)
+        verbose_name_plural = 'heat similarities'
 
 
 class Legitimacies(models.Model):
@@ -465,11 +512,15 @@ class Legitimacies(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'legitimacies'
+        verbose_name_plural = 'legitimacies'
 
 
 class Meet(models.Model):
@@ -486,9 +537,13 @@ class Meet(models.Model):
     actual_eliteness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
+    categories = models.ManyToManyField(Category, through=CategoryMeet)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'meet'
@@ -511,8 +566,11 @@ class MeetInstance(models.Model):
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'meet_instance'
@@ -523,7 +581,7 @@ class MeetInstanceReview(models.Model):
     review = models.ForeignKey('Review', models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField()
+    last_modified_at = models.DateTimeField()
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
 
     class Meta:
@@ -536,9 +594,12 @@ class MeetType(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'meet_type'
@@ -549,9 +610,12 @@ class Mode(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'mode'
@@ -590,7 +654,7 @@ class Performance(models.Model):
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -606,7 +670,7 @@ class PerformanceAnnotation(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -633,9 +697,12 @@ class PerformanceState(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'performance_state'
@@ -647,13 +714,14 @@ class RelayMembers(models.Model):
     is_alternate = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
     class Meta:
         db_table = 'relay_members'
         unique_together = (('relay', 'identity'),)
+        verbose_name_plural = 'relay members'
 
 
 class RelayPerformanceParticipants(models.Model):
@@ -664,12 +732,13 @@ class RelayPerformanceParticipants(models.Model):
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_relay_participant_performance')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_relay_participant_performance')
 
     class Meta:
         db_table = 'relay_performance_participants'
         unique_together = (('performance', 'relay', 'member'),)
+        verbose_name_plural = 'relay performance participants'
 
 
 class RelaySplit(models.Model):
@@ -684,7 +753,7 @@ class RelaySplit(models.Model):
     leg_time = models.DecimalField(max_digits=10, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -700,7 +769,7 @@ class Review(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -713,7 +782,7 @@ class ReviewFlag(models.Model):
     flag = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -734,8 +803,11 @@ class Rule(models.Model):
     appealed_at = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_updated = models.DateTimeField(blank=True, null=True)
-    last_updated_by = models.PositiveIntegerField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.PositiveIntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'rule'
@@ -750,11 +822,12 @@ class Sanctions(models.Model):
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
         db_table = 'sanctions'
+        verbose_name_plural = 'sanctions'
 
 
 class Seed(models.Model):
@@ -765,7 +838,7 @@ class Seed(models.Model):
     value = models.DecimalField(max_digits=12, decimal_places=4)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -780,8 +853,11 @@ class SeedMethod(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'seed_method'
@@ -792,20 +868,24 @@ class Series(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'series'
+        verbose_name_plural = 'series'
 
 
 class SeriesHierarchy(models.Model):
-    parent = models.OneToOneField(Series, on_delete=models.DO_NOTHING, related_name='child_series')
+    parent = models.ForeignKey(Series, on_delete=models.DO_NOTHING, related_name='child_series')
     child = models.ForeignKey(Series, models.DO_NOTHING, related_name='parent_series')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -816,10 +896,10 @@ class SeriesHierarchy(models.Model):
 
 class SeriesMeet(models.Model):
     series = models.OneToOneField(Series, on_delete=models.DO_NOTHING)
-    meet = models.ForeignKey(Meet, models.DO_NOTHING)
+    meet = models.ForeignKey(Meet, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -834,12 +914,17 @@ class SocialClass(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'social_class'
+        verbose_name = 'social class'
+        verbose_name_plural = 'social classes'
 
 
 class SocialClassAlias(models.Model):
@@ -848,12 +933,13 @@ class SocialClassAlias(models.Model):
     value = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_social_class_aliases')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_social_class_aliases')
 
     class Meta:
         db_table = 'social_class_alias'
         unique_together = (('social_class', 'value'),)
+        verbose_name_plural = 'social class aliases'
 
 
 class Split(models.Model):
@@ -864,7 +950,7 @@ class Split(models.Model):
     time = models.DecimalField(max_digits=10, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -880,7 +966,7 @@ class SponsorshipAthlete(models.Model):
     end_date = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -896,7 +982,7 @@ class SponsorshipCompetition(models.Model):
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -911,10 +997,13 @@ class Sport(models.Model):
     scoring_units = models.ForeignKey('utility.Unit', models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     wikipedia = models.CharField(max_length=150)
     knowledge_graph = models.OneToOneField('utility.KnowledgeGraph', on_delete=models.DO_NOTHING, unique=True, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'sport'
@@ -926,8 +1015,11 @@ class SportType(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'sport_type'
@@ -942,7 +1034,7 @@ class StagingAttempt(models.Model):
     wind = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -955,7 +1047,7 @@ class StagingAttemptSequential(models.Model):
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -968,7 +1060,7 @@ class StagingAttemptThreshold(models.Model):
     sequence = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -990,8 +1082,11 @@ class StagingCompetition(models.Model):
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'staging_competition'
@@ -1006,8 +1101,11 @@ class StagingEntity(models.Model):
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'staging_entity'
@@ -1021,9 +1119,12 @@ class StagingHeat(models.Model):
     description = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'staging_heat'
@@ -1038,9 +1139,12 @@ class StagingMeet(models.Model):
     championship = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'staging_meet'
@@ -1057,8 +1161,11 @@ class StagingMeetInstance(models.Model):
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'staging_meet_instance'
@@ -1082,7 +1189,7 @@ class StagingPerformance(models.Model):
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
@@ -1095,7 +1202,7 @@ class StagingRelayMembers(models.Model):
     staging_identity = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relay_memberships')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -1112,7 +1219,7 @@ class StagingRelayPerformanceParticipants(models.Model):
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_staging_relay_participants')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_staging_relay_participants')
 
     class Meta:
@@ -1132,7 +1239,7 @@ class StagingRelaySplit(models.Model):
     leg_time = models.DecimalField(max_digits=10, decimal_places=3)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
 
@@ -1153,9 +1260,12 @@ class StagingVenue(models.Model):
     elevation = models.DecimalField(max_digits=12, decimal_places=8)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'staging_venue'
@@ -1166,12 +1276,16 @@ class Strategy(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'strategy'
+        verbose_name_plural = "strategies"
 
 
 class Substances(models.Model):
@@ -1182,11 +1296,15 @@ class Substances(models.Model):
     banned_at = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'substances'
+        verbose_name_plural = 'substances'
 
 
 class Tier(models.Model):
@@ -1196,9 +1314,12 @@ class Tier(models.Model):
     level = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'tier'
@@ -1209,9 +1330,12 @@ class TimingSystem(models.Model):
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified = models.DateTimeField(blank=True, null=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
     source = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'timing_system'
