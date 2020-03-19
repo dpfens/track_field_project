@@ -250,6 +250,21 @@ class IdentityType(models.Model):
         db_table = 'identity_type'
 
 
+class OrganizationMembership(models.Model):
+    organization = models.ForeignKey(Identity, models.DO_NOTHING, related_name='members')
+    member = models.ForeignKey(Identity, models.DO_NOTHING, related_name='%(class)s')
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    class Meta:
+        db_table = 'organization_membership'
+        unique_together = (('organization', 'member'),)
+
+
 class OrganizationType(models.Model):
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
