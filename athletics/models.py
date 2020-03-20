@@ -346,6 +346,7 @@ class Disqualification(models.Model):
 
 class Division(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
+    organization = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -359,6 +360,7 @@ class Division(models.Model):
 
     class Meta:
         db_table = 'division'
+        unique_together = (('organization', 'name'),)
 
 
 class Environment(models.Model):
@@ -526,6 +528,9 @@ class Legitimacies(models.Model):
 class Meet(models.Model):
     meet_type = models.ForeignKey('MeetType', models.DO_NOTHING)
     environment = models.ForeignKey(Environment, models.DO_NOTHING)
+    organizer = models.ForeignKey('identity.Identity', models.DO_NOTHING, null=True, related_name='organized_meets')
+    organization = models.ForeignKey('identity.Identity', models.DO_NOTHING, null=True, related_name='sanctioned_meets')
+    division = models.ForeignKey(Division, models.DO_NOTHING, null=True)
     name = models.CharField(max_length=100)
     slug = models.CharField(unique=True, max_length=100)
     description = models.CharField(max_length=255)

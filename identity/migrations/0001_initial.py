@@ -12,8 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     def create_entity_types(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         identity = models.Identity.objects.get(user_id=superuser.id)
         types = ['Person', 'Organization', 'Government', 'Bot', 'Relay']
         for type in types:
@@ -24,7 +23,7 @@ class Migration(migrations.Migration):
                 entity_type.save()
 
     def create_identity_types(apps, schema_editor):
-        types = ['Anonymous User', 'User', 'Person', 'Bot', 'Relay']
+        types = ['Anonymous User', 'User', 'Person', 'Organization', 'Bot', 'Relay']
         for type in types:
             try:
                 models.IdentityType.objects.get(name=type)
@@ -33,11 +32,10 @@ class Migration(migrations.Migration):
                 identity_type.save()
 
     def create_organization_types(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         identity = models.Identity.objects.get(user_id=superuser.id)
 
-        types = ['Business', 'Federation', 'Government', 'Association']
+        types = ['Business', 'Federation', 'Government', 'Association', 'Conference', 'University',  'Club']
         for type in types:
             try:
                 models.OrganizationType.objects.get(name=type)
@@ -46,8 +44,7 @@ class Migration(migrations.Migration):
                 organization_type.save()
 
     def create_organization(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = models.Identity.objects.get(user_id=superuser.id)
 
         now = datetime.now()
