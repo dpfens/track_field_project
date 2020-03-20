@@ -253,6 +253,7 @@ class IdentityType(models.Model):
 class OrganizationMembership(models.Model):
     organization = models.ForeignKey(Identity, models.DO_NOTHING, related_name='members')
     member = models.ForeignKey(Identity, models.DO_NOTHING, related_name='%(class)s')
+    division = models.ForeignKey('athletics.Division', models.DO_NOTHING, related_name='membership')
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

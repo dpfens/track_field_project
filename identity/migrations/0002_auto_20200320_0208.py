@@ -8,15 +8,18 @@ from identity import models
 from athletics import models as athletics_models
 
 
-def create_entity_identity(name, entity_type, identity_type, creator, organization_type=None):
-    existing_entity = models.Entity.objects.filter(name=name).all()
+def create_entity(name, entity_type, creator):
+    existing_entity = models.Entity.objects.filter(name=name, entity_type=entity_type).all()
     if not existing_entity:
         entity = models.Entity(name=name, entity_type=entity_type, knowledge_graph_id=None, created_by=creator)
         entity.save()
     else:
         entity = existing_entity[0]
+    return entity
 
-    existing_identity = models.Identity.objects.filter(identifier=name).all()
+
+def create_identity(entity, name, identity_type, creator, organization_type=None):
+    existing_identity = models.Identity.objects.filter(name=name, identifier=name, identity_type=identity_type).all()
     if not existing_identity:
         identity = models.Identity(name=name, identifier=name, identity_type=identity_type, is_private=False, created_by=creator)
         identity.save()
@@ -37,6 +40,13 @@ def create_entity_identity(name, entity_type, identity_type, creator, organizati
     return identity
 
 
+def create_entity_identity(name, entity_type, identity_type, creator, organization_type=None):
+    entity = create_entity(name, entity_type, creator)
+    identity = create_identity(entity, name, identity_type, creator, organization_type)
+
+    return entity, identity
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -50,18 +60,20 @@ class Migration(migrations.Migration):
         organization_entity_type = models.EntityType.objects.filter(name='Organization').first()
         identity_type = models.IdentityType.objects.filter(name='Organization').first()
         association_organization_type = models.OrganizationType.objects.filter(name='Association').first()
-        naia_identity = create_entity_identity('NAIA', organization_entity_type, identity_type, superuser_identity, association_organization_type)
+        association_name = 'National Association of Intercollegiate Athletics'
+        association_acronym = 'NAIA'
+        naia_entity = create_entity(association_name, organization_entity_type, superuser_identity)
+        naia_identity = create_identity(naia_entity, association_acronym, identity_type, superuser_identity, association_organization_type)
 
         identity_university_organization_type = models.OrganizationType.objects.filter(name='University').first()
         with open('identity/migrations/college_conferences/NAIA_schools.csv', 'r') as input_file:
             data = list(csv.DictReader(input_file))
-        divisions = set(row['Division'] for row in data)
         conferences = set(row['Conference'] for row in data if row['Conference'])
 
         conference_organization_type = models.OrganizationType.objects.filter(name='Conference').first()
         conference_lookup = dict()
         for conference in conferences:
-            conference_identity = create_entity_identity(conference, organization_entity_type, identity_type, superuser_identity, conference_organization_type)
+            conference_entity, conference_identity = create_entity_identity(conference, organization_entity_type, identity_type, superuser_identity, conference_organization_type)
             conference_lookup[conference] = conference_identity
 
             existing_membership = models.OrganizationMembership.objects.filter(organization=naia_identity, member=conference_identity).all()
@@ -72,7 +84,7 @@ class Migration(migrations.Migration):
 
         for row in data:
             school_name = row['School']
-            school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
+            school_entity, school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
 
             conference_name = row['Conference']
             if not conference_name:
@@ -91,7 +103,10 @@ class Migration(migrations.Migration):
         organization_entity_type = models.EntityType.objects.filter(name='Organization').first()
         identity_type = models.IdentityType.objects.filter(name='Organization').first()
         association_organization_type = models.OrganizationType.objects.filter(name='Association').first()
-        ncaa_identity = create_entity_identity('NCAA', organization_entity_type, identity_type, superuser_identity, association_organization_type)
+        association_name = 'National Collegiate Athletic Association'
+        association_acronym = 'NCAA'
+        ncaa_entity = create_entity(association_name, organization_entity_type, superuser_identity)
+        ncaa_identity = create_identity(ncaa_entity, association_acronym, identity_type, superuser_identity, association_organization_type)
 
         identity_university_organization_type = models.OrganizationType.objects.filter(name='University').first()
         with open('identity/migrations/college_conferences/NCAA_D1_schools.csv', 'r') as input_file:
@@ -100,7 +115,7 @@ class Migration(migrations.Migration):
 
         existing_divisions = athletics_models.Division.objects.filter(organization=ncaa_identity, name=1).all()
         if not existing_divisions:
-            division_instance = athletics_models.Division(organization=ncaa_identity, name=1, created_by=superuser_identity)
+            division_instance = athletics_models.Division(organization=ncaa_identity, name=1, description='', created_by=superuser_identity)
             division_instance.save()
         else:
             division_instance = existing_divisions[0]
@@ -109,7 +124,7 @@ class Migration(migrations.Migration):
         conference_organization_type = models.OrganizationType.objects.filter(name='Conference').first()
         conference_lookup = dict()
         for conference in conferences:
-            conference_identity = create_entity_identity(conference, organization_entity_type, identity_type, superuser_identity, conference_organization_type)
+            conference_entity, conference_identity = create_entity_identity(conference, organization_entity_type, identity_type, superuser_identity, conference_organization_type)
             conference_lookup[conference] = conference_identity
 
             existing_membership = models.OrganizationMembership.objects.filter(organization=ncaa_identity, member=conference_identity).all()
@@ -120,7 +135,7 @@ class Migration(migrations.Migration):
 
         for row in data:
             school_name = row['School']
-            school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
+            school_entity, school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
 
             conference_name = row['Primary Conference']
             if not conference_name:
@@ -129,7 +144,7 @@ class Migration(migrations.Migration):
             existing_membership = models.OrganizationMembership.objects.filter(organization=conference, member=school_identity).all()
             if not existing_membership:
                 start_date = datetime(1900, 1, 1)
-                membership_instance = models.OrganizationMembership(organization=conference, member=school_identity, start_date=start_date, created_by=superuser_identity)
+                membership_instance = models.OrganizationMembership(organization=conference, member=school_identity, division=division_instance, start_date=start_date, created_by=superuser_identity)
                 membership_instance.save()
 
     def create_ncaa_d2(apps, schema_editor):
@@ -139,7 +154,11 @@ class Migration(migrations.Migration):
         organization_entity_type = models.EntityType.objects.filter(name='Organization').first()
         identity_type = models.IdentityType.objects.filter(name='Organization').first()
         association_organization_type = models.OrganizationType.objects.filter(name='Association').first()
-        ncaa_identity = create_entity_identity('NCAA', organization_entity_type, identity_type, superuser_identity, association_organization_type)
+
+        association_name = 'National Collegiate Athletic Association'
+        association_acronym = 'NCAA'
+        ncaa_entity = create_entity(association_name, organization_entity_type, superuser_identity)
+        ncaa_identity = create_identity(ncaa_entity, association_acronym, identity_type, superuser_identity, association_organization_type)
 
         identity_university_organization_type = models.OrganizationType.objects.filter(name='University').first()
         with open('identity/migrations/college_conferences/NCAA_D2_schools.csv', 'r') as input_file:
@@ -152,12 +171,11 @@ class Migration(migrations.Migration):
             division_instance.save()
         else:
             division_instance = existing_divisions[0]
-        # TODO: Associate an organization with a division
 
         conference_organization_type = models.OrganizationType.objects.filter(name='Conference').first()
         conference_lookup = dict()
         for conference in conferences:
-            conference_identity = create_entity_identity(conference, organization_entity_type, identity_type, superuser_identity, conference_organization_type)
+            conference_entity, conference_identity = create_entity_identity(conference, organization_entity_type, identity_type, superuser_identity, conference_organization_type)
             conference_lookup[conference] = conference_identity
 
             existing_membership = models.OrganizationMembership.objects.filter(organization=ncaa_identity, member=conference_identity).all()
@@ -168,7 +186,7 @@ class Migration(migrations.Migration):
 
         for row in data:
             school_name = row['School']
-            school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
+            school_entity, school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
 
             conference_name = row['Conference']
             if not conference_name:
@@ -177,7 +195,7 @@ class Migration(migrations.Migration):
             existing_membership = models.OrganizationMembership.objects.filter(organization=conference, member=school_identity).all()
             if not existing_membership:
                 start_date = datetime(1900, 1, 1)
-                membership_instance = models.OrganizationMembership(organization=conference, member=school_identity, start_date=start_date, created_by=superuser_identity)
+                membership_instance = models.OrganizationMembership(organization=conference, member=school_identity, division=division_instance, start_date=start_date, created_by=superuser_identity)
                 membership_instance.save()
 
     def create_ncaa_d3(apps, schema_editor):
@@ -187,7 +205,11 @@ class Migration(migrations.Migration):
         organization_entity_type = models.EntityType.objects.filter(name='Organization').first()
         identity_type = models.IdentityType.objects.filter(name='Organization').first()
         association_organization_type = models.OrganizationType.objects.filter(name='Association').first()
-        ncaa_identity = create_entity_identity('NCAA', organization_entity_type, identity_type, superuser_identity, association_organization_type)
+
+        association_name = 'National Collegiate Athletic Association'
+        association_acronym = 'NCAA'
+        ncaa_entity = create_entity(association_name, organization_entity_type, superuser_identity)
+        ncaa_identity = create_identity(ncaa_entity, association_acronym, identity_type, superuser_identity, association_organization_type)
 
         identity_university_organization_type = models.OrganizationType.objects.filter(name='University').first()
         with open('identity/migrations/college_conferences/NCAA_D3_schools.csv', 'r') as input_file:
@@ -205,18 +227,18 @@ class Migration(migrations.Migration):
         conference_organization_type = models.OrganizationType.objects.filter(name='Conference').first()
         conference_lookup = dict()
         for conference in conferences:
-            conference_identity = create_entity_identity(conference, organization_entity_type, identity_type, superuser_identity, conference_organization_type)
+            conference_entity, conference_identity = create_entity_identity(conference, organization_entity_type, identity_type, superuser_identity, conference_organization_type)
             conference_lookup[conference] = conference_identity
 
             existing_membership = models.OrganizationMembership.objects.filter(organization=ncaa_identity, member=conference_identity).all()
             if not existing_membership:
                 start_date = datetime(1900, 1, 1)
-                membership_instance = models.OrganizationMembership(organization=ncaa_identity, member=conference_identity, start_date=start_date, created_by=superuser_identity)
+                membership_instance = models.OrganizationMembership(organization=ncaa_identity, member=conference_identity, division=division_instance, start_date=start_date, created_by=superuser_identity)
                 membership_instance.save()
 
         for row in data:
             school_name = row['School']
-            school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
+            school_entity, school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
 
             conference_name = row['Conference']
             if not conference_name:
@@ -225,7 +247,7 @@ class Migration(migrations.Migration):
             existing_membership = models.OrganizationMembership.objects.filter(organization=conference, member=school_identity).all()
             if not existing_membership:
                 start_date = datetime(1900, 1, 1)
-                membership_instance = models.OrganizationMembership(organization=conference, member=school_identity, start_date=start_date, created_by=superuser_identity)
+                membership_instance = models.OrganizationMembership(organization=conference, member=school_identity, division=division_instance, start_date=start_date, created_by=superuser_identity)
                 membership_instance.save()
 
     def create_nccaa(apps, schema_editor):
@@ -235,43 +257,53 @@ class Migration(migrations.Migration):
         organization_entity_type = models.EntityType.objects.filter(name='Organization').first()
         identity_type = models.IdentityType.objects.filter(name='Organization').first()
         association_organization_type = models.OrganizationType.objects.filter(name='Association').first()
-        nccaa_identity = create_entity_identity('NCCAA', organization_entity_type, identity_type, superuser_identity, association_organization_type)
+        association_name = 'National Christian College Athletic Association'
+        association_acronym = 'NCCAA'
+        nccaa_entity = create_entity(association_name, organization_entity_type, superuser_identity)
+        nccaa_identity = create_identity(nccaa_entity, association_acronym, identity_type, superuser_identity, association_organization_type)
 
         identity_university_organization_type = models.OrganizationType.objects.filter(name='University').first()
         with open('identity/migrations/college_conferences/NCCAA_schools.csv', 'r') as input_file:
             data = list(csv.DictReader(input_file))
         regions = set(row['Region'] for row in data if row['Region'])
-        divisions = set(row['Division'] for row in data if row['Division'])
-        conferences = set(row['Other Affiliations'] for row in data if row['Other Affiliations'])
 
         region_lookup = dict()
         for region in regions:
-            region_identity = create_entity_identity(region, organization_entity_type, identity_type, superuser_identity, association_organization_type)
+            region_name = '%s - %s' % (association_acronym, region)
+            region_identity = create_identity(nccaa_entity, region_name, identity_type, superuser_identity, association_organization_type)
+
+            existing_membership = models.OrganizationMembership.objects.filter(organization=nccaa_identity, member=region_identity).all()
+            if not existing_membership:
+                start_date = datetime(1900, 1, 1)
+                membership_instance = models.OrganizationMembership(organization=nccaa_identity, member=region_identity, start_date=start_date, created_by=superuser_identity)
+                membership_instance.save()
             region_lookup[region] = region_identity
 
         for row in data:
             school_name = row['School']
-            region = region_lookup[row['Region']]
-            division = row['Division']
-            school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
 
-            # TODO: Associate an organization with a region/division
-            existing_divisions = athletics_models.Division.objects.filter(organization=nccaa_identity, name=region).all()
+            school_entity, school_identity = create_entity_identity(school_name, organization_entity_type, identity_type, superuser_identity, identity_university_organization_type)
+            region = row['Region']
+            region_identity = region_lookup[region]
+
+            division = row['Division']
+            existing_divisions = athletics_models.Division.objects.filter(organization=region_identity, name=division).all()
             if not existing_divisions:
-                division_instance = athletics_models.Division(organization=nccaa_identity, name=region, created_by=superuser_identity)
+                division_instance = athletics_models.Division(organization=region_identity, name=division, created_by=superuser_identity)
                 division_instance.save()
             else:
                 division_instance = existing_divisions[0]
 
-            existing_membership = models.OrganizationMembership.objects.filter(organization=region, member=school_identity).all()
+            existing_membership = models.OrganizationMembership.objects.filter(organization=region_identity, member=school_identity).all()
             if not existing_membership:
                 start_date = datetime(1900, 1, 1)
-                membership_instance = models.OrganizationMembership(organization=region, member=school_identity, start_date=start_date, created_by=superuser_identity)
+                membership_instance = models.OrganizationMembership(organization=region_identity, member=school_identity, division=division_instance, start_date=start_date, created_by=superuser_identity)
                 membership_instance.save()
 
     operations = [
-        # migrations.RunPython(create_naia),
-        #migrations.RunPython(create_ncaa_d1),
+        migrations.RunPython(create_naia),
+        migrations.RunPython(create_ncaa_d1),
         migrations.RunPython(create_ncaa_d2),
-        migrations.RunPython(create_ncaa_d3)
+        migrations.RunPython(create_ncaa_d3),
+        migrations.RunPython(create_nccaa)
     ]

@@ -345,7 +345,6 @@ class Disqualification(models.Model):
 
 
 class Division(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     organization = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=255)

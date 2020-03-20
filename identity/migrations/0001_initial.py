@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         superuser = User.objects.filter(is_superuser=True).first()
         identity = models.Identity.objects.get(user_id=superuser.id)
 
-        types = ['Business', 'Federation', 'Government', 'Association', 'Conference', 'University',  'Club']
+        types = ['Business', 'Federation', 'Government', 'Association', 'Committee', 'Conference', 'University',  'Club']
         for type in types:
             try:
                 models.OrganizationType.objects.get(name=type)
