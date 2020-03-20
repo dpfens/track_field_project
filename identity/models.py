@@ -29,7 +29,6 @@ class Entity(models.Model):
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    identities = models.ManyToManyField('Identity', through='EntityIdentity', through_fields=('entity_id', 'identity_id'))
 
     def __str__(self):
         return self.name
@@ -138,7 +137,8 @@ class Identity(models.Model):
     identity_type = models.ForeignKey('IdentityType', models.DO_NOTHING)
     organization = models.ForeignKey('self', models.DO_NOTHING, null=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.DO_NOTHING, null=True)
-    identifier = models.CharField(max_length=50)
+    identifier = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     is_private = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('self', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by', null=True)
