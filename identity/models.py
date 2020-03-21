@@ -22,7 +22,7 @@ class Entity(models.Model):
     entity_type = models.ForeignKey('EntityType', models.DO_NOTHING)
     name = models.CharField(max_length=150)
     knowledge_graph = models.ForeignKey('utility.KnowledgeGraph', models.DO_NOTHING, blank=True, null=True)
-    website = models.CharField(max_length=50, blank=True, null=True)
+    website = models.CharField(max_length=100, blank=True, null=True)
     url = models.CharField(max_length=500, blank=True, null=True)
     source = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
