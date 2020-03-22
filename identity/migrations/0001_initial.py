@@ -75,6 +75,16 @@ class Migration(migrations.Migration):
             entity_identity = models.EntityIdentity(entity=entity, identity=organization_identity, created_by=superuser_identity, is_private=False)
             entity_identity.save()
 
+    def create_genders(apps, schema_editor):
+        superuser = User.objects.filter(is_superuser=True).first()
+        superuser_identity = models.Identity.objects.get(user_id=superuser.id)
+        genders = ('Male', 'Female')
+        for gender_name in genders:
+            gender = models.Gender.objects.filter(name=gender_name).first()
+            if not gender:
+                gender = models.Gender(name=gender_name, description='', created_by=superuser_identity)
+                gender.save()
+
     def create_superuser(apps, schema_editor):
         user_name = input('username for superuser:')
         try:

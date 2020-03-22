@@ -218,7 +218,7 @@ class PerformanceStateAdmin(admin.ModelAdmin):
     list_display = ('code', 'name')
 
 
-@admin.register(models.RelayMembers, site=advanced_admin)
+@admin.register(models.RelayMember, site=advanced_admin)
 class RelayMembersAdmin(admin.ModelAdmin):
     list_display = ('relay', 'identity', 'is_alternate')
 

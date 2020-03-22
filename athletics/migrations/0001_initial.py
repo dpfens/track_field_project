@@ -707,7 +707,7 @@ class Migration(migrations.Migration):
         superuser = superusers[0]
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
-        meet_types = ['Cross Country', 'Track & Field']
+        meet_types = ['Cross Country', 'Track & Field', 'Road Race']
         for name in meet_types:
             try:
                 instance = athletics.models.MeetType.objects.get(name=name)

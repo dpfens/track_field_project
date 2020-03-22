@@ -124,7 +124,6 @@ class Gender(models.Model):
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='gender_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='gender_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=25)
 
     def __str__(self):
         return self.name
@@ -209,7 +208,7 @@ class IdentityPerson(models.Model):
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(blank=True, null=True)
     date_of_death = models.DateField(blank=True, null=True)
-    source = models.CharField(max_length=25)
+    source = models.CharField(max_length=25, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)

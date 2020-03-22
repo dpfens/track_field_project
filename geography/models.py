@@ -1,4 +1,5 @@
 from django.db import models
+from django.template.defaultfilters import slugify
 
 # Create your models here.
 class Address(models.Model):
@@ -256,7 +257,12 @@ class Venue(models.Model):
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=20)
+    source = models.CharField(max_length=20, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Venue, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'venue'
