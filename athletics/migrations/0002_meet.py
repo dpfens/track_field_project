@@ -115,10 +115,11 @@ class Migration(migrations.Migration):
             meet_instance.save()
 
         marathon_event = models.Event.objects.filter(name='Marathon').first()
+        competition_type = models.CompetitionType.objects.filter(name='Race').first()
 
         competition = models.Competition.objects.filter(meet_instance=meet_instance, event=marathon_event, name='Marathon', slug='2014-valencia-marathon').first()
         if not competition:
-            competition = models.Competition(meet_instance=meet_instance, event=marathon_event, name='Marathon', slug='2014-valencia-marathon', url='', participants=0, created_by=superuser_identity)
+            competition = models.Competition(competition_type=competition_type, meet_instance=meet_instance, event=marathon_event, name='Marathon', slug='2014-valencia-marathon', url='', participants=0, created_by=superuser_identity)
             competition.save()
 
         tier = models.Tier.objects.filter(name='Finals').first()
@@ -238,9 +239,10 @@ class Migration(migrations.Migration):
 
         run_mode = models.Mode.objects.filter(name='Run').first()
         event = models.Event.objects.filter(name='4 x 400m Relay').first()
+        competition_type = models.CompetitionType.objects.filter(name='Race').first()
         competition = models.Competition.objects.filter(meet_instance=meet_instance, event=event, mode=run_mode, name='4 x 400m Men', slug='4-400m-men').first()
         if not competition:
-            competition = models.Competition(meet_instance=meet_instance, event=event, mode=run_mode, name='4 x 400m Men', slug='4-400m-men', description='', url=meet_url, participants=0, created_by=superuser_identity)
+            competition = models.Competition(competition_type=competition_type, meet_instance=meet_instance, event=event, mode=run_mode, name='4 x 400m Men', slug='4-400m-men', description='', url=meet_url, participants=0, created_by=superuser_identity)
             competition.save()
 
         finals_tier = models.Tier.objects.filter(name='Finals').first()

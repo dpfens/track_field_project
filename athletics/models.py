@@ -218,6 +218,7 @@ class Comment(models.Model):
 
 
 class Competition(models.Model):
+    competition_type = models.ForeignKey('CompetitionType', models.DO_NOTHING)
     meet_instance = models.ForeignKey('MeetInstance', models.DO_NOTHING)
     division = models.ForeignKey('Division', models.DO_NOTHING, null=True, blank=True)
     event = models.ForeignKey('Event', models.DO_NOTHING)
@@ -261,6 +262,18 @@ class CompetitionSimilarity(models.Model):
         db_table = 'competition_similarity'
         unique_together = (('competition', 'other'),)
         verbose_name_plural = 'competition similarities'
+
+
+class CompetitionType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    class Meta:
+        db_table = 'competition_type'
 
 
 class Course(models.Model):

@@ -28,6 +28,20 @@ class Migration(migrations.Migration):
                 instance = athletics.models.SportType(name=name, description='', created_by=superuser_identity)
                 instance.save()
 
+    def competition_type(apps, schema_editor):
+        superusers = User.objects.filter(is_superuser=True).all()
+        superuser = superusers[0]
+        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
+
+        types = ['Race', 'Trial']
+
+        for name in types:
+            try:
+                competition_type = athletics.models.CompetitionType.objects.get(name=name)
+            except Exception:
+                competition_type = athletics.models.Competition(name=name, description='', created_by=superuser_identity)
+                competition_type.save()
+
 
     def add_sports(apps, schema_editor):
         superusers = User.objects.filter(is_superuser=True).all()
@@ -799,5 +813,6 @@ class Migration(migrations.Migration):
         migrations.RunPython(add_events),
         migrations.RunPython(add_modes),
         migrations.RunPython(add_legitimacies),
-        migrations.RunPython(add_social_class)
+        migrations.RunPython(add_social_class),
+        migrations.RunPython(competition_type)
     ]
