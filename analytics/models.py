@@ -13,7 +13,6 @@ class Algorithm(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithms')
 
     class Meta:
-        managed = False
         db_table = 'algorithm'
 
 
@@ -26,7 +25,6 @@ class AlgorithmApproach(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='lasT_modified_algorithm_approaches')
 
     class Meta:
-        managed = False
         db_table = 'algorithm_approach'
 
 
@@ -40,7 +38,6 @@ class AlgorithmExecution(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameter_executions')
 
     class Meta:
-        managed = False
         db_table = 'algorithm_execution'
 
 
@@ -55,7 +52,6 @@ class AlgorithmParameter(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameters')
 
     class Meta:
-        managed = False
         db_table = 'algorithm_parameter'
         unique_together = (('algorithm', 'name'),)
 
@@ -70,7 +66,6 @@ class AlgorithmParameterValue(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameter_values')
 
     class Meta:
-        managed = False
         db_table = 'algorithm_parameter_value'
         unique_together = (('execution', 'parameter'),)
 
@@ -84,7 +79,6 @@ class AlgorithmType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_types')
 
     class Meta:
-        managed = False
         db_table = 'algorithm_type'
 
 
@@ -135,7 +129,6 @@ class Browser(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browsers')
 
     class Meta:
-        managed = False
         db_table = 'analytics_browser'
 
 
@@ -149,7 +142,6 @@ class BrowserFeature(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_features')
 
     class Meta:
-        managed = False
         db_table = 'analytics_browser_feature'
 
 
@@ -163,7 +155,6 @@ class BrowserFeatures(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_feature_relationships')
 
     class Meta:
-        managed = False
         db_table = 'analytics_browser_features'
         unique_together = (('analytics_browser', 'analytics_browser_feature'),)
 
@@ -178,7 +169,6 @@ class Device(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_devices')
 
     class Meta:
-        managed = False
         db_table = 'analytics_device'
         unique_together = (('device_type', 'manufacturer', 'name'),)
 
@@ -193,7 +183,6 @@ class DeviceType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_device_types')
 
     class Meta:
-        managed = False
         db_table = 'analytics_device_type'
 
 
@@ -207,7 +196,6 @@ class IpAddress(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_ip_addresses')
 
     class Meta:
-        managed = False
         db_table = 'analytics_ip_address'
         unique_together = (('ip_address_type', 'value'),)
 
@@ -221,7 +209,6 @@ class IpAddressType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_ip_address_types')
 
     class Meta:
-        managed = False
         db_table = 'analytics_ip_address_type'
 
 
@@ -240,7 +227,6 @@ class OperatingSystem(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_operating_systems')
 
     class Meta:
-        managed = False
         db_table = 'analytics_operating_system'
         unique_together = (('manufacturer', 'name'),)
 
@@ -255,7 +241,6 @@ class Referrer(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_referrers')
 
     class Meta:
-        managed = False
         db_table = 'analytics_referrer'
 
 
@@ -269,7 +254,6 @@ class ReferrerType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_referrer_types')
 
     class Meta:
-        managed = False
         db_table = 'analytics_referrer_type'
 
 
@@ -287,7 +271,6 @@ class Request(models.Model):
     requested_at = models.DateTimeField()
 
     class Meta:
-        managed = False
         db_table = 'analytics_request'
 
 
@@ -301,7 +284,6 @@ class RequestFeature(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_features')
 
     class Meta:
-        managed = False
         db_table = 'analytics_request_feature'
         unique_together = (('request', 'feature'),)
 
@@ -316,7 +298,6 @@ class RequestHeader(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_headers')
 
     class Meta:
-        managed = False
         db_table = 'analytics_request_header'
 
 
@@ -329,7 +310,6 @@ class RequestHeaderType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_header_types')
 
     class Meta:
-        managed = False
         db_table = 'analytics_request_header_type'
 
 
@@ -342,7 +322,6 @@ class RequestHeaderValue(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_header_values')
 
     class Meta:
-        managed = False
         db_table = 'analytics_request_header_value'
         unique_together = (('header', 'value'),)
 
@@ -352,7 +331,6 @@ class RequestHeaderValues(models.Model):
     header_value_id = models.PositiveIntegerField()
 
     class Meta:
-        managed = False
         db_table = 'analytics_request_header_values'
 
 
@@ -365,7 +343,6 @@ class RequestMethod(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_methods')
 
     class Meta:
-        managed = False
         db_table = 'analytics_request_method'
 
 
@@ -378,7 +355,6 @@ class RequestType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_types')
 
     class Meta:
-        managed = False
         db_table = 'analytics_request_type'
 
 
@@ -391,7 +367,6 @@ class Url(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_urls')
 
     class Meta:
-        managed = False
         db_table = 'analytics_url'
 
 
@@ -403,7 +378,6 @@ class UrlParameter(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_url_parameters')
 
     class Meta:
-        managed = False
         db_table = 'analytics_url_parameter'
 
 
@@ -417,7 +391,6 @@ class UrlParameterValue(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_url_parameter_values')
 
     class Meta:
-        managed = False
         db_table = 'analytics_url_parameter_value'
         unique_together = (('parameter', 'value'),)
 
@@ -428,7 +401,6 @@ class UrlParameterValues(models.Model):
     parameter_value_id = models.BigIntegerField()
 
     class Meta:
-        managed = False
         db_table = 'analytics_url_parameter_values'
 
 
@@ -436,5 +408,4 @@ class UserAgent(models.Model):
     value = models.CharField(unique=True, max_length=250)
 
     class Meta:
-        managed = False
         db_table = 'analytics_user_agent'

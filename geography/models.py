@@ -19,7 +19,6 @@ class Address(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_addresses')
 
     class Meta:
-        managed = False
         db_table = 'address'
 
 
@@ -34,7 +33,6 @@ class AddressComponent(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_address_components')
 
     class Meta:
-        managed = False
         db_table = 'address_component'
 
 
@@ -47,7 +45,6 @@ class AddressComponentType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_address_component_types')
 
     class Meta:
-        managed = False
         db_table = 'address_component_type'
 
 
@@ -60,7 +57,6 @@ class Amenity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_amenities')
 
     class Meta:
-        managed = False
         db_table = 'amenity'
 
 
@@ -75,7 +71,6 @@ class Continent(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_continents')
 
     class Meta:
-        managed = False
         db_table = 'continent'
 
 
@@ -104,7 +99,6 @@ class Country(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
 
     class Meta:
-        managed = False
         db_table = 'country'
 
 
@@ -118,7 +112,6 @@ class CountryCodes(models.Model):
     end_date = models.DateField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'country_codes'
 
 
@@ -131,7 +124,6 @@ class CountryCurrency(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_country_currencies')
 
     class Meta:
-        managed = False
         db_table = 'country_currency'
         unique_together = (('country', 'currency'),)
 
@@ -146,7 +138,6 @@ class Currency(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_currencies')
 
     class Meta:
-        managed = False
         db_table = 'currency'
 
 
@@ -162,7 +153,6 @@ class Language(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_languages')
 
     class Meta:
-        managed = False
         db_table = 'language'
 
 
@@ -177,7 +167,6 @@ class LanguageVariant(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_language_variants')
 
     class Meta:
-        managed = False
         db_table = 'language_variant'
 
 
@@ -195,7 +184,6 @@ class Location(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_locations')
 
     class Meta:
-        managed = False
         db_table = 'location'
 
 
@@ -208,7 +196,6 @@ class LocationAddress(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_addresses')
 
     class Meta:
-        managed = False
         db_table = 'location_address'
         unique_together = (('address_component', 'location'),)
 
@@ -222,7 +209,6 @@ class LocationType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_type')
 
     class Meta:
-        managed = False
         db_table = 'location_type'
 
 
@@ -235,7 +221,6 @@ class LocationTypes(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_types')
 
     class Meta:
-        managed = False
         db_table = 'location_types'
         unique_together = (('location_type', 'location'),)
 

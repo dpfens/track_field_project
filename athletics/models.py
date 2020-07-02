@@ -16,7 +16,6 @@ class Annotation(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_annotations')
 
     class Meta:
-        managed = False
         db_table = 'annotation'
 
 
@@ -29,7 +28,6 @@ class AnnotationAttemptSequential(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_sequential_attempt_annotations')
 
     class Meta:
-        managed = False
         db_table = 'annotation_attempt_sequential'
 
 
@@ -42,7 +40,6 @@ class AnnotationAttemptThreshold(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_threshold_attempt_annotations')
 
     class Meta:
-        managed = False
         db_table = 'annotation_attempt_threshold'
 
 
@@ -58,7 +55,6 @@ class AnnotationSplit(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_annotation_splits')
 
     class Meta:
-        managed = False
         db_table = 'annotation_split'
 
 
@@ -72,7 +68,6 @@ class AnnotationType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_annotation_types')
 
     class Meta:
-        managed = False
         db_table = 'annotation_type'
 
 
@@ -88,7 +83,6 @@ class AnnotationVote(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_annotation_votes')
 
     class Meta:
-        managed = False
         db_table = 'annotation_vote'
         unique_together = (('annotation', 'identity', 'up', 'down'),)
 
@@ -101,7 +95,6 @@ class Area(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_areas')
 
     class Meta:
-        managed = False
         db_table = 'area'
 
 
@@ -118,7 +111,6 @@ class Attempt(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_attempts')
 
     class Meta:
-        managed = False
         db_table = 'attempt'
 
 
@@ -131,7 +123,6 @@ class AttemptSequential(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_sequential_attempts')
 
     class Meta:
-        managed = False
         db_table = 'attempt_sequential'
         unique_together = (('attempt', 'sequence'),)
 
@@ -145,7 +136,6 @@ class AttemptThreshold(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_attempt_thresholds')
 
     class Meta:
-        managed = False
         db_table = 'attempt_threshold'
         unique_together = (('attempt', 'sequence'),)
 
@@ -159,7 +149,6 @@ class Category(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_categories')
 
     class Meta:
-        managed = False
         db_table = 'category'
 
 
@@ -172,7 +161,6 @@ class CategoryHierarchy(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_category_hierarchies')
 
     class Meta:
-        managed = False
         db_table = 'category_hierarchy'
         unique_together = (('parent', 'child'),)
 
@@ -186,7 +174,6 @@ class CategoryMeet(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_category_meets')
 
     class Meta:
-        managed = False
         db_table = 'category_meet'
         unique_together = (('meet', 'category'),)
 
@@ -202,7 +189,6 @@ class Coach(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_coaches')
 
     class Meta:
-        managed = False
         db_table = 'coach'
 
 
@@ -220,7 +206,6 @@ class Comment(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_comments')
 
     class Meta:
-        managed = False
         db_table = 'comment'
 
 
@@ -248,7 +233,6 @@ class Competition(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_competitions')
 
     class Meta:
-        managed = False
         db_table = 'competition'
         unique_together = (('meet_instance', 'slug'),)
 
@@ -261,7 +245,6 @@ class CompetitionEvent(models.Model):
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='last_modified_competition_events')
 
     class Meta:
-        managed = False
         db_table = 'competition_event'
 
 
@@ -276,7 +259,6 @@ class CompetitionRace(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_competition_races')
 
     class Meta:
-        managed = False
         db_table = 'competition_race'
 
 
@@ -290,7 +272,6 @@ class CompetitionSimilarity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_competition_similarities')
 
     class Meta:
-        managed = False
         db_table = 'competition_similarity'
         unique_together = (('competition', 'other'),)
 
@@ -304,7 +285,6 @@ class CompetitionType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_competition_types')
 
     class Meta:
-        managed = False
         db_table = 'competition_type'
 
 
@@ -319,7 +299,6 @@ class Course(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_courses')
 
     class Meta:
-        managed = False
         db_table = 'course'
 
 
@@ -335,7 +314,6 @@ class CourseGrade(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_course_grades')
 
     class Meta:
-        managed = False
         db_table = 'course_grade'
         unique_together = (('course', 'sequence'),)
 
@@ -350,7 +328,6 @@ class CourseSimilarity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_course_similarities')
 
     class Meta:
-        managed = False
         db_table = 'course_similarity'
         unique_together = (('course', 'other'),)
 
@@ -367,7 +344,6 @@ class CourseSurface(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_course_surfaces')
 
     class Meta:
-        managed = False
         db_table = 'course_surface'
         unique_together = (('course', 'sequence'),)
 
@@ -382,7 +358,6 @@ class CourseType(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_course_types')
 
     class Meta:
-        managed = False
         db_table = 'course_type'
 
 
@@ -396,7 +371,6 @@ class Discipline(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_disciplines')
 
     class Meta:
-        managed = False
         db_table = 'discipline'
 
 
@@ -411,7 +385,6 @@ class Disqualification(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_disqualifications')
 
     class Meta:
-        managed = False
         db_table = 'disqualification'
         unique_together = (('organization', 'code'),)
 
@@ -427,7 +400,6 @@ class Division(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_divisions')
 
     class Meta:
-        managed = False
         db_table = 'division'
         unique_together = (('organization', 'name'),)
 
@@ -441,7 +413,6 @@ class Environment(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_environments')
 
     class Meta:
-        managed = False
         db_table = 'environment'
 
 
@@ -456,7 +427,6 @@ class Event(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_events')
 
     class Meta:
-        managed = False
         db_table = 'event'
 
 
@@ -470,7 +440,6 @@ class EventDistance(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_event_distances')
 
     class Meta:
-        managed = False
         db_table = 'event_distance'
 
 
@@ -484,7 +453,6 @@ class EventHurdles(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_event_hurdles')
 
     class Meta:
-        managed = False
         db_table = 'event_hurdles'
 
 
@@ -498,7 +466,6 @@ class EventWeight(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_event_weights')
 
     class Meta:
-        managed = False
         db_table = 'event_weight'
 
 
@@ -515,7 +482,6 @@ class FieldOfPlay(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_fields_of_play')
 
     class Meta:
-        managed = False
         db_table = 'field_of_play'
 
 
@@ -531,7 +497,6 @@ class Heat(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_heats')
 
     class Meta:
-        managed = False
         db_table = 'heat'
         unique_together = (('competition', 'tier', 'name'),)
 
@@ -551,7 +516,6 @@ class HeatClustering(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_heat_clusterings')
 
     class Meta:
-        managed = False
         db_table = 'heat_clustering'
         unique_together = (('heat', 'id', 'min_eps', 'min_points', 'max_eps', 'max_points', 'fuzzy'),)
 
@@ -568,7 +532,6 @@ class HeatClusteringAssignments(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_heat_clustering_assignments')
 
     class Meta:
-        managed = False
         db_table = 'heat_clustering_assignments'
         unique_together = (('clustering', 'performance', 'cluster'),)
 
@@ -583,7 +546,6 @@ class HeatSimilarity(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_heat_similarities')
 
     class Meta:
-        managed = False
         db_table = 'heat_similarity'
         unique_together = (('heat', 'other'),)
         verbose_name_plural = 'heat similarities'
@@ -930,7 +892,6 @@ class Scoring(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_scorings')
 
     class Meta:
-        managed = False
         db_table = 'scoring'
 
 
@@ -1408,7 +1369,6 @@ class Surface(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_surfaces')
 
     class Meta:
-        managed = False
         db_table = 'surface'
 
 
