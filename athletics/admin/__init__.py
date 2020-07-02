@@ -64,8 +64,8 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(models.Competition, site=advanced_admin)
 class CompetitionAdmin(admin.ModelAdmin):
-    list_display = ('event', 'subevent', 'division', 'meet_instance')
-    list_select_related = ('event', 'subevent', 'division', 'meet_instance')
+    list_display = ('division', 'meet_instance')
+    list_select_related = ('division', 'meet_instance')
 
 
 @admin.register(models.CompetitionSimilarity, site=advanced_admin)
@@ -75,13 +75,12 @@ class CompetitionSimilarityAdmin(admin.ModelAdmin):
 
 @admin.register(models.Course, site=advanced_admin)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('venue', 'terrain')
-    list_select_related = ('venue', 'terrain')
+    pass
 
 
-@admin.register(models.CourseSegment, site=advanced_admin)
-class CourseSegmentAdmin(admin.ModelAdmin):
-    list_display = ('course', 'sequence', 'terrain', 'grade')
+@admin.register(models.CourseSurface, site=advanced_admin)
+class CourseSurfaceAdmin(admin.ModelAdmin):
+    list_display = ('course', 'sequence', 'surface')
 
 
 @admin.register(models.CourseSimilarity, site=advanced_admin)

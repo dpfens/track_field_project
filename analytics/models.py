@@ -7,63 +7,55 @@ class Algorithm(models.Model):
     approach = models.ForeignKey('AlgorithmApproach', models.DO_NOTHING)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithms')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.name
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithms')
 
     class Meta:
+        managed = False
         db_table = 'algorithm'
 
 
 class AlgorithmApproach(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_approaches')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.name
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='lasT_modified_algorithm_approaches')
 
     class Meta:
+        managed = False
         db_table = 'algorithm_approach'
 
 
 class AlgorithmExecution(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
     algorithm = models.ForeignKey(Algorithm, models.DO_NOTHING)
     start = models.DateTimeField()
     end = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_executions')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameter_executions')
 
     class Meta:
+        managed = False
         db_table = 'algorithm_execution'
 
 
 class AlgorithmParameter(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
     algorithm = models.ForeignKey(Algorithm, models.DO_NOTHING)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
     is_optional = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_parameters')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.name
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameters')
 
     class Meta:
+        managed = False
         db_table = 'algorithm_parameter'
         unique_together = (('algorithm', 'name'),)
 
@@ -72,29 +64,27 @@ class AlgorithmParameterValue(models.Model):
     parameter = models.ForeignKey(AlgorithmParameter, models.DO_NOTHING)
     execution = models.ForeignKey(AlgorithmExecution, models.DO_NOTHING)
     value = models.CharField(max_length=14)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_parameter_values')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameter_values')
 
     class Meta:
+        managed = False
         db_table = 'algorithm_parameter_value'
         unique_together = (('execution', 'parameter'),)
 
 
 class AlgorithmType(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.name
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_types')
 
     class Meta:
+        managed = False
         db_table = 'algorithm_type'
 
 
@@ -139,47 +129,41 @@ class Browser(models.Model):
     build_maintenance_version = models.PositiveIntegerField(blank=True, null=True)
     revision_build_version = models.PositiveIntegerField(blank=True, null=True)
     version = models.CharField(max_length=20, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField()
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
-
-    def __str__(self):
-        return '%s v.%s' % (self.name, self.version)
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browsers')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browsers')
 
     class Meta:
+        managed = False
         db_table = 'analytics_browser'
-
-    def __repr__(self):
-        return '<%s %s name=%r, version=%r>' % (self.__class__.__name__, id(self), self.name, self.version)
 
 
 class BrowserFeature(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browser_features')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_features')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
+        managed = False
         db_table = 'analytics_browser_feature'
 
 
 class BrowserFeatures(models.Model):
     analytics_browser = models.ForeignKey(Browser, models.DO_NOTHING)
     analytics_browser_feature = models.ForeignKey(BrowserFeature, models.DO_NOTHING)
-    supported = models.BooleanField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browser_feature_instances')
+    supported = models.IntegerField()
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browser_feature_relationships')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_feature_instances')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_feature_relationships')
 
     class Meta:
+        managed = False
         db_table = 'analytics_browser_features'
         unique_together = (('analytics_browser', 'analytics_browser_feature'),)
 
@@ -188,74 +172,57 @@ class Device(models.Model):
     device_type = models.ForeignKey('DeviceType', models.DO_NOTHING)
     manufacturer = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True)
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_devices')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_devices')
 
     class Meta:
+        managed = False
         db_table = 'analytics_device'
         unique_together = (('device_type', 'manufacturer', 'name'),)
-
-    def __repr__(self):
-
-        return '<%s %s manufacturer=%r, name=%r>' % (self.__class__.__name__, id(self), self.manufacturer, self.name)
-
-    def __str__(self):
-        return str(self.name)
 
 
 class DeviceType(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_device_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_device_types')
 
     class Meta:
+        managed = False
         db_table = 'analytics_device_type'
-
-    def __repr__(self):
-        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
-
-    def __str__(self):
-        return str(self.name)
 
 
 class IpAddress(models.Model):
     id = models.BigAutoField(primary_key=True)
     ip_address_type = models.ForeignKey('IpAddressType', models.DO_NOTHING)
-    value = models.BinaryField(max_length=16)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    value = models.CharField(max_length=32)
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_ip_addresses')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.value
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_ip_addresses')
 
     class Meta:
+        managed = False
         db_table = 'analytics_ip_address'
+        unique_together = (('ip_address_type', 'value'),)
 
 
 class IpAddressType(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_ip_address_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.name
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_ip_address_types')
 
     class Meta:
+        managed = False
         db_table = 'analytics_ip_address_type'
-
-    def __repr__(self):
-        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
 
 
 class OperatingSystem(models.Model):
@@ -267,41 +234,28 @@ class OperatingSystem(models.Model):
     build_maintenance_version = models.PositiveIntegerField(blank=True, null=True)
     revision_build_version = models.PositiveIntegerField(blank=True, null=True)
     version = models.CharField(max_length=20, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_operating_systems')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_operating_systems')
 
     class Meta:
+        managed = False
         db_table = 'analytics_operating_system'
         unique_together = (('manufacturer', 'name'),)
-
-    def __repr__(self):
-        return '<%s %s manufacturer=%r, name=%r, version=%r>' % (self.__class__.__name__, id(self), self.manufacturer, self.name, self.version)
-
-    def __str__(self):
-        output = ''
-        if self.manufacturer:
-            output += self.manufacturer + ' '
-        output += self.name
-        if self.version:
-            output += ' v%s' % self.version
-        return output
 
 
 class Referrer(models.Model):
     id = models.BigAutoField(primary_key=True)
     referrer_type = models.ForeignKey('ReferrerType', models.DO_NOTHING)
     value = models.CharField(max_length=250)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_referrers')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.value
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_referrers')
 
     class Meta:
+        managed = False
         db_table = 'analytics_referrer'
 
 
@@ -309,19 +263,14 @@ class ReferrerType(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_referrer_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_referrer_types')
 
     class Meta:
+        managed = False
         db_table = 'analytics_referrer_type'
-
-    def __repr__(self):
-        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
-
-    def __str__(self):
-        return str(self.name)
 
 
 class Request(models.Model):
@@ -336,73 +285,64 @@ class Request(models.Model):
     url_id = models.BigIntegerField()
     user_agent_id = models.PositiveIntegerField()
     requested_at = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.PositiveIntegerField()
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
+        managed = False
         db_table = 'analytics_request'
 
 
 class RequestFeature(models.Model):
     request = models.ForeignKey(Request, models.DO_NOTHING)
     feature = models.ForeignKey(BrowserFeature, models.DO_NOTHING)
-    supported = models.BooleanField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_browser_features')
+    supported = models.IntegerField()
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_features')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_browser_features')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_features')
 
     class Meta:
+        managed = False
         db_table = 'analytics_request_feature'
         unique_together = (('request', 'feature'),)
 
 
-class RequestHeaderType(models.Model):
-    name = models.CharField(unique=True, max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_header_types')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, null=True, blank=True, db_column='last_modified_by', related_name='modified_header_types')
-
-    class Meta:
-        db_table = 'analytics_request_header_type'
-
-    def __repr__(self):
-        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
-
-    def __str__(self):
-        return str(self.name)
-
-
 class RequestHeader(models.Model):
-    type = models.ForeignKey(RequestHeaderType, on_delete=models.DO_NOTHING)
+    id = models.PositiveSmallIntegerField(primary_key=True)
+    type = models.ForeignKey('RequestHeaderType', models.DO_NOTHING)
     name = models.CharField(unique=True, max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_headers')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_headers')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, null=True, blank=True, db_column='last_modified_by', related_name='modified_headers')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_headers')
 
     class Meta:
+        managed = False
         db_table = 'analytics_request_header'
 
-    def __repr__(self):
-        return '<%s %s type=%r, name=%r>' % (self.__class__.__name__, id(self), self.type, self.name)
 
-    def __str__(self):
-        return self.name
+class RequestHeaderType(models.Model):
+    id = models.PositiveSmallIntegerField(primary_key=True)
+    name = models.CharField(unique=True, max_length=50)
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_header_types')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_header_types')
+
+    class Meta:
+        managed = False
+        db_table = 'analytics_request_header_type'
 
 
 class RequestHeaderValue(models.Model):
     header = models.ForeignKey(RequestHeader, models.DO_NOTHING)
-    value = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_header_values')
+    value = models.CharField(max_length=250)
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_header_values')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True, db_column='last_modified_by', related_name='modified_header_values')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_header_values')
 
     class Meta:
+        managed = False
         db_table = 'analytics_request_header_value'
         unique_together = (('header', 'value'),)
 
@@ -412,69 +352,58 @@ class RequestHeaderValues(models.Model):
     header_value_id = models.PositiveIntegerField()
 
     class Meta:
+        managed = False
         db_table = 'analytics_request_header_values'
 
 
 class RequestMethod(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=10)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField()
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_methods')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_methods')
 
     class Meta:
+        managed = False
         db_table = 'analytics_request_method'
-
-    def __repr__(self):
-        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
-
-    def __str__(self):
-        return str(self.name)
 
 
 class RequestType(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_types')
 
     class Meta:
+        managed = False
         db_table = 'analytics_request_type'
-
-    def __repr__(self):
-        return '<%s %s name=%r>' % (self.__class__.__name__, id(self), self.name)
-
-    def __str__(self):
-        return str(self.name)
 
 
 class Url(models.Model):
     id = models.BigAutoField(primary_key=True)
     value = models.CharField(unique=True, max_length=250)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_urls')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_urls')
 
     class Meta:
+        managed = False
         db_table = 'analytics_url'
 
 
 class UrlParameter(models.Model):
     name = models.CharField(unique=True, max_length=25)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_url_parameters')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_url_parameters')
-
-    def __str__(self):
-        return self.name
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_url_parameters')
 
     class Meta:
+        managed = False
         db_table = 'analytics_url_parameter'
 
 
@@ -482,12 +411,13 @@ class UrlParameterValue(models.Model):
     id = models.BigAutoField(primary_key=True)
     parameter = models.ForeignKey(UrlParameter, models.DO_NOTHING)
     value = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_url_parameter_values')
-    last_modified_at = models.DateTimeField(auto_now_add=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, null=True, db_column='last_modified_by', related_name='modified_url_parameter_values')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_url_parameter_values')
 
     class Meta:
+        managed = False
         db_table = 'analytics_url_parameter_value'
         unique_together = (('parameter', 'value'),)
 
@@ -498,6 +428,7 @@ class UrlParameterValues(models.Model):
     parameter_value_id = models.BigIntegerField()
 
     class Meta:
+        managed = False
         db_table = 'analytics_url_parameter_values'
 
 
@@ -505,19 +436,5 @@ class UserAgent(models.Model):
     value = models.CharField(unique=True, max_length=250)
 
     class Meta:
+        managed = False
         db_table = 'analytics_user_agent'
-
-    def __repr__(self):
-        return '<%s %s value=%r>' % (self.__class__.__name__, id(self), self.value)
-
-    def __str__(self):
-        return str(self.value)
-
-
-class UserLoginArchive(models.Model):
-    user = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    login = models.DateTimeField()
-    logout = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'user_login_archive'

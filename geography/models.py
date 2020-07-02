@@ -13,12 +13,13 @@ class Address(models.Model):
     state = models.CharField(max_length=50)
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_addresses')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_addresses')
 
     class Meta:
+        managed = False
         db_table = 'address'
 
 
@@ -27,37 +28,39 @@ class AddressComponent(models.Model):
     name = models.CharField(max_length=150)
     long_name = models.CharField(max_length=150)
     short_name = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_address_components')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_address_components')
 
     class Meta:
+        managed = False
         db_table = 'address_component'
 
 
 class AddressComponentType(models.Model):
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_address_component_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
-    source = models.CharField(max_length=25)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_address_component_types')
 
     class Meta:
+        managed = False
         db_table = 'address_component_type'
 
 
 class Amenity(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.IntegerField()
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_amenities')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.PositiveIntegerField()
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_amenities')
 
     class Meta:
+        managed = False
         db_table = 'amenity'
 
 
@@ -65,24 +68,19 @@ class Continent(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
     code = models.CharField(unique=True, max_length=2)
     name = models.CharField(unique=True, max_length=13)
-    geonames_id = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    geonames_id = models.IntegerField()
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_continents')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
-
-    def __unicode__(self):
-        return self.name
-
-    def __str__(self):
-        return self.name
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_continents')
 
     class Meta:
+        managed = False
         db_table = 'continent'
 
 
 class Country(models.Model):
-    continent = models.ForeignKey(Continent, models.DO_NOTHING, null=True)
+    continent = models.ForeignKey(Continent, models.DO_NOTHING)
     iso = models.CharField(unique=True, max_length=2, blank=True, null=True)
     iso3 = models.CharField(max_length=3, blank=True, null=True)
     iso_numeric = models.IntegerField(blank=True, null=True)
@@ -99,16 +97,14 @@ class Country(models.Model):
     postal_code_format = models.CharField(max_length=55, blank=True, null=True)
     postal_code_regex = models.CharField(max_length=400, blank=True, null=True)
     languages = models.CharField(max_length=200, blank=True, null=True)
-    geonames_id = models.PositiveIntegerField(blank=True, null=True)
+    geonames_id = models.IntegerField(blank=True, null=True)
     neighbours = models.CharField(max_length=41, blank=True, null=True)
     equivalent_fips_code = models.CharField(max_length=2, blank=True, null=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
 
-    def __unicode__(self):
-        return self.full_name
-
     class Meta:
+        managed = False
         db_table = 'country'
 
 
@@ -122,18 +118,20 @@ class CountryCodes(models.Model):
     end_date = models.DateField(blank=True, null=True)
 
     class Meta:
+        managed = False
         db_table = 'country_codes'
 
 
 class CountryCurrency(models.Model):
-    country = models.OneToOneField(Country, on_delete=models.DO_NOTHING, primary_key=True)
+    country = models.ForeignKey(Country, models.DO_NOTHING)
     currency = models.ForeignKey('Currency', models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_country_currencies')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_country_currencies')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_country_currencies')
 
     class Meta:
+        managed = False
         db_table = 'country_currency'
         unique_together = (('country', 'currency'),)
 
@@ -142,12 +140,13 @@ class Currency(models.Model):
     id = models.PositiveSmallIntegerField(primary_key=True)
     code = models.CharField(max_length=10)
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_currencies')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='modified_currencies')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_currencies')
 
     class Meta:
+        managed = False
         db_table = 'currency'
 
 
@@ -157,12 +156,13 @@ class Language(models.Model):
     iso_639_2 = models.CharField(max_length=11, blank=True, null=True)
     iso_639_1 = models.CharField(max_length=2, blank=True, null=True)
     name = models.CharField(max_length=58, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.PositiveIntegerField()
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_languages')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.PositiveIntegerField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_languages')
 
     class Meta:
+        managed = False
         db_table = 'language'
 
 
@@ -171,12 +171,13 @@ class LanguageVariant(models.Model):
     iso_639_1 = models.CharField(max_length=14, blank=True, null=True)
     language_code = models.CharField(max_length=4, blank=True, null=True)
     territory = models.CharField(max_length=3, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.PositiveIntegerField()
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_language_variants')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.PositiveIntegerField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_language_variants')
 
     class Meta:
+        managed = False
         db_table = 'language_variant'
 
 
@@ -188,25 +189,26 @@ class Location(models.Model):
     latitude = models.DecimalField(max_digits=12, decimal_places=3)
     longitude = models.DecimalField(max_digits=12, decimal_places=3)
     elevation = models.DecimalField(max_digits=12, decimal_places=5, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_locations')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=20)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_locations')
 
     class Meta:
+        managed = False
         db_table = 'location'
 
 
 class LocationAddress(models.Model):
     location = models.ForeignKey(Location, models.DO_NOTHING)
-    address_component = models.OneToOneField(AddressComponent, on_delete=models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    address_component = models.ForeignKey(AddressComponent, models.DO_NOTHING)
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_addresses')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_addresses')
 
     class Meta:
+        managed = False
         db_table = 'location_address'
         unique_together = (('address_component', 'location'),)
 
@@ -214,25 +216,26 @@ class LocationAddress(models.Model):
 class LocationType(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_type')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=25)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_type')
 
     class Meta:
+        managed = False
         db_table = 'location_type'
 
 
 class LocationTypes(models.Model):
-    location_type = models.OneToOneField(LocationType, on_delete=models.DO_NOTHING)
+    location_type = models.ForeignKey(LocationType, models.DO_NOTHING)
     location = models.ForeignKey(Location, models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_at = models.DateTimeField()
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_types')
 
     class Meta:
+        managed = False
         db_table = 'location_types'
         unique_together = (('location_type', 'location'),)
 
