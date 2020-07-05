@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+
+User = get_user_model()
+
+
 # Create your models here.
 class Attribute(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_attributes')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_attributes')
@@ -21,7 +24,7 @@ class Entity(models.Model):
     knowledge_graph = models.ForeignKey('utility.KnowledgeGraph', models.DO_NOTHING, blank=True, null=True)
     website = models.CharField(max_length=100, blank=True, null=True)
     url = models.CharField(max_length=500, blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_entities')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_entities')
@@ -34,7 +37,7 @@ class EntityAlias(models.Model):
     entity = models.ForeignKey(Entity, models.DO_NOTHING)
     name = models.CharField(max_length=100)
     preferred_indicator = models.IntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_entity_aliases',)
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_entity_aliases')
@@ -50,7 +53,7 @@ class EntityAttribute(models.Model):
     is_primary = models.PositiveIntegerField()
     start = models.DateTimeField()
     end = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_entity_attributes')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_entity_attributes')
@@ -64,7 +67,7 @@ class EntityIdentity(models.Model):
     entity = models.ForeignKey(Entity, models.DO_NOTHING)
     identity = models.ForeignKey('Identity', models.DO_NOTHING)
     is_private = models.PositiveIntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_entity_identities')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_entity_identities')
@@ -79,7 +82,7 @@ class EntityTrait(models.Model):
     trait = models.ForeignKey('Trait', models.DO_NOTHING)
     value = models.CharField(max_length=13)
     is_primary = models.PositiveIntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_entity_traits')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_entity_traits')
@@ -90,10 +93,9 @@ class EntityTrait(models.Model):
 
 
 class EntityType(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_entity_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_entity_types')
@@ -105,7 +107,7 @@ class EntityType(models.Model):
 class Ethnicity(models.Model):
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_ethnicities')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_ethncities')
@@ -117,7 +119,7 @@ class Ethnicity(models.Model):
 class Gender(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_genders')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_genders')
@@ -127,14 +129,14 @@ class Gender(models.Model):
 
 
 class GoogleLogin(models.Model):
-    user_id = models.PositiveIntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     iss = models.CharField(max_length=50)
     sub = models.CharField(max_length=50)
     azp = models.CharField(max_length=75)
     aud = models.CharField(max_length=75)
     iat = models.PositiveIntegerField()
     exp = models.PositiveIntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_google_logins')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_google_logins')
@@ -146,11 +148,11 @@ class GoogleLogin(models.Model):
 class Identity(models.Model):
     identity_type = models.ForeignKey('IdentityType', models.DO_NOTHING)
     organization = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
-    user_id = models.IntegerField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     identifier = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     is_private = models.PositiveIntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('self', models.DO_NOTHING, db_column='created_by', blank=True, null=True, related_name='created_identities')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('self', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_identities')
@@ -167,7 +169,7 @@ class IdentityAttribute(models.Model):
     is_primary = models.PositiveIntegerField()
     start = models.DateTimeField()
     end = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='created_identity_attribute')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_identity_attribute')
@@ -194,7 +196,7 @@ class IdentityOrganization(models.Model):
     headquarters_location = models.ForeignKey('geography.Location', models.DO_NOTHING, blank=True, null=True, related_name='headquarted_identity_organizations')
     formation_date = models.DateField(blank=True, null=True)
     dissolution_date = models.DateField(blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='created_identity_organization')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_identity_organization')
@@ -214,7 +216,7 @@ class IdentityPerson(models.Model):
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(blank=True, null=True)
     date_of_death = models.DateField(blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='created_identity_person')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_identity_person')
@@ -228,7 +230,7 @@ class IdentityTrait(models.Model):
     trait = models.ForeignKey('Trait', models.DO_NOTHING)
     value = models.CharField(max_length=13)
     is_primary = models.PositiveIntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', related_name='created_identity_traits')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_identity_traits')
@@ -239,10 +241,9 @@ class IdentityTrait(models.Model):
 
 
 class IdentityType(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='created_by', blank=True, null=True, related_name='created_identity_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey(Identity, models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_identity_types')
@@ -254,7 +255,7 @@ class IdentityType(models.Model):
 class OrganizationMembership(models.Model):
     organization = models.ForeignKey(Identity, models.DO_NOTHING, related_name='members')
     member = models.ForeignKey(Identity, models.DO_NOTHING, related_name='%(class)s')
-    division = models.ForeignKey('athletics.Division', models.DO_NOTHING, related_name='membership')
+    division = models.ForeignKey('athletics.Division', models.DO_NOTHING, null=True, related_name='membership')
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -283,10 +284,9 @@ class OrganizationType(models.Model):
 
 
 class Race(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='created_by', related_name='created_races')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_races')
@@ -296,7 +296,6 @@ class Race(models.Model):
 
 
 class Trait(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -346,8 +345,6 @@ class StagingIdentityOrganization(models.Model):
 class StagingIdentityPerson(models.Model):
     staging_identity = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
     gender = models.ForeignKey('identity.Gender', models.DO_NOTHING)
-    race_id = models.PositiveIntegerField(blank=True, null=True)
-    ethnicity_id = models.PositiveIntegerField(blank=True, null=True)
     given_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, blank=True, null=True)
     last_name = models.CharField(max_length=100)

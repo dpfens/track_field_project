@@ -64,7 +64,7 @@ def create_entity_identity(name, entity_type, identity_type, creator, **kwargs):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('identity', '0001_initial'),
+        ('identity', '0003_prepopulate_tables'),
     ]
 
     def create_naia(apps, schema_editor):

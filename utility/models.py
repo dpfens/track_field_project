@@ -1,6 +1,25 @@
 from django.db import models
 
+
 # Create your models here.
+class Feedback(models.Model):
+    identity = models.ForeignKey('identity.Identity', on_delete=models.DO_NOTHING, null=True)
+    url = models.CharField(max_length=250)
+    feedback_type = models.ForeignKey('FeedbackType', on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_modified_at = models.DateTimeField(blank=True, null=True, auto_now=True)
+
+
+class FeedbackType(models.Model):
+    name = models.CharField(max_length=150)
+    description = models.CharField(max_length=250)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_feedback_types')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_feedback_types', blank=True, null=True)
+
+
 class KnowledgeGraph(models.Model):
     id = models.CharField(primary_key=True, max_length=20)
     type = models.CharField(max_length=20)
@@ -20,12 +39,11 @@ class KnowledgeGraph(models.Model):
 
 
 class Quantity(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=150)
     description = models.TextField()
     wikipedia_url = models.CharField(max_length=150)
     symbol = models.CharField(max_length=10)
-    si_unit = models.ForeignKey('Unit', models.DO_NOTHING, related_name='si_quantity')
+    si_unit = models.ForeignKey('Unit', models.DO_NOTHING, null=True, related_name='si_quantity')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
@@ -59,7 +77,6 @@ class Unit(models.Model):
 
 
 class UnitSystem(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=150)
     description = models.TextField()
     wikipedia_url = models.CharField(max_length=200)

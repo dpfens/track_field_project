@@ -2,12 +2,11 @@ from django.db import models
 
 # Create your models here.
 class Algorithm(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     type = models.ForeignKey('AlgorithmType', models.DO_NOTHING)
     approach = models.ForeignKey('AlgorithmApproach', models.DO_NOTHING)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithms')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithms')
@@ -19,7 +18,7 @@ class Algorithm(models.Model):
 class AlgorithmApproach(models.Model):
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_approaches')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='lasT_modified_algorithm_approaches')
@@ -32,7 +31,7 @@ class AlgorithmExecution(models.Model):
     algorithm = models.ForeignKey(Algorithm, models.DO_NOTHING)
     start = models.DateTimeField()
     end = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_executions')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameter_executions')
@@ -46,7 +45,7 @@ class AlgorithmParameter(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
     is_optional = models.PositiveIntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_parameters')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameters')
@@ -60,7 +59,7 @@ class AlgorithmParameterValue(models.Model):
     parameter = models.ForeignKey(AlgorithmParameter, models.DO_NOTHING)
     execution = models.ForeignKey(AlgorithmExecution, models.DO_NOTHING)
     value = models.CharField(max_length=14)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_parameter_values')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_parameter_values')
@@ -73,7 +72,7 @@ class AlgorithmParameterValue(models.Model):
 class AlgorithmType(models.Model):
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_algorithm_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_algorithm_types')
@@ -83,7 +82,6 @@ class AlgorithmType(models.Model):
 
 
 class AthleteClustering(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     division = models.ForeignKey('athletics.Division', models.DO_NOTHING, blank=True, null=True)
     discipline = models.ForeignKey('athletics.Discipline', models.DO_NOTHING, blank=True, null=True)
@@ -115,7 +113,6 @@ class AthleteClusteringAssignment(models.Model):
 
 
 class Browser(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=250)
     major_version = models.PositiveIntegerField()
@@ -123,7 +120,7 @@ class Browser(models.Model):
     build_maintenance_version = models.PositiveIntegerField(blank=True, null=True)
     revision_build_version = models.PositiveIntegerField(blank=True, null=True)
     version = models.CharField(max_length=20, blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browsers')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browsers')
@@ -133,10 +130,9 @@ class Browser(models.Model):
 
 
 class BrowserFeature(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browser_features')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_features')
@@ -149,7 +145,7 @@ class BrowserFeatures(models.Model):
     analytics_browser = models.ForeignKey(Browser, models.DO_NOTHING)
     analytics_browser_feature = models.ForeignKey(BrowserFeature, models.DO_NOTHING)
     supported = models.IntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_browser_feature_relationships')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_browser_feature_relationships')
@@ -163,7 +159,7 @@ class Device(models.Model):
     device_type = models.ForeignKey('DeviceType', models.DO_NOTHING)
     manufacturer = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True)
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_devices')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_devices')
@@ -174,10 +170,9 @@ class Device(models.Model):
 
 
 class DeviceType(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_device_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_device_types')
@@ -190,7 +185,7 @@ class IpAddress(models.Model):
     id = models.BigAutoField(primary_key=True)
     ip_address_type = models.ForeignKey('IpAddressType', models.DO_NOTHING)
     value = models.CharField(max_length=32)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_ip_addresses')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_ip_addresses')
@@ -203,7 +198,7 @@ class IpAddress(models.Model):
 class IpAddressType(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_ip_address_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_ip_address_types')
@@ -213,7 +208,6 @@ class IpAddressType(models.Model):
 
 
 class OperatingSystem(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     manufacturer = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True)
     name = models.CharField(max_length=25)
     major_version = models.PositiveIntegerField(blank=True, null=True)
@@ -221,7 +215,7 @@ class OperatingSystem(models.Model):
     build_maintenance_version = models.PositiveIntegerField(blank=True, null=True)
     revision_build_version = models.PositiveIntegerField(blank=True, null=True)
     version = models.CharField(max_length=20, blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_operating_systems')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_operating_systems')
@@ -235,7 +229,7 @@ class Referrer(models.Model):
     id = models.BigAutoField(primary_key=True)
     referrer_type = models.ForeignKey('ReferrerType', models.DO_NOTHING)
     value = models.CharField(max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_referrers')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_referrers')
@@ -245,10 +239,9 @@ class Referrer(models.Model):
 
 
 class ReferrerType(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_referrer_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_referrer_types')
@@ -278,7 +271,7 @@ class RequestFeature(models.Model):
     request = models.ForeignKey(Request, models.DO_NOTHING)
     feature = models.ForeignKey(BrowserFeature, models.DO_NOTHING)
     supported = models.IntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_features')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_features')
@@ -289,10 +282,9 @@ class RequestFeature(models.Model):
 
 
 class RequestHeader(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     type = models.ForeignKey('RequestHeaderType', models.DO_NOTHING)
     name = models.CharField(unique=True, max_length=50)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_headers')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_headers')
@@ -302,9 +294,8 @@ class RequestHeader(models.Model):
 
 
 class RequestHeaderType(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(unique=True, max_length=50)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_header_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_header_types')
@@ -316,7 +307,7 @@ class RequestHeaderType(models.Model):
 class RequestHeaderValue(models.Model):
     header = models.ForeignKey(RequestHeader, models.DO_NOTHING)
     value = models.CharField(max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_header_values')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_header_values')
@@ -337,7 +328,7 @@ class RequestHeaderValues(models.Model):
 class RequestMethod(models.Model):
     name = models.CharField(unique=True, max_length=10)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_methods')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_methods')
@@ -349,7 +340,7 @@ class RequestMethod(models.Model):
 class RequestType(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_request_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_request_types')
@@ -361,7 +352,7 @@ class RequestType(models.Model):
 class Url(models.Model):
     id = models.BigAutoField(primary_key=True)
     value = models.CharField(unique=True, max_length=250)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_urls')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_urls')
@@ -372,7 +363,7 @@ class Url(models.Model):
 
 class UrlParameter(models.Model):
     name = models.CharField(unique=True, max_length=25)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_url_parameters')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_url_parameters')
@@ -385,7 +376,7 @@ class UrlParameterValue(models.Model):
     id = models.BigAutoField(primary_key=True)
     parameter = models.ForeignKey(UrlParameter, models.DO_NOTHING)
     value = models.CharField(max_length=100)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_url_parameter_values')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_url_parameter_values')

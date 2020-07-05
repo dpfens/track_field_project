@@ -13,7 +13,7 @@ class Address(models.Model):
     state = models.CharField(max_length=50)
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=3)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_addresses')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_addresses')
@@ -27,7 +27,7 @@ class AddressComponent(models.Model):
     name = models.CharField(max_length=150)
     long_name = models.CharField(max_length=150)
     short_name = models.CharField(max_length=100)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_address_components')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_address_components')
@@ -39,7 +39,7 @@ class AddressComponent(models.Model):
 class AddressComponentType(models.Model):
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_address_component_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_address_component_types')
@@ -51,7 +51,7 @@ class AddressComponentType(models.Model):
 class Amenity(models.Model):
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_amenities')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_amenities')
@@ -61,11 +61,10 @@ class Amenity(models.Model):
 
 
 class Continent(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     code = models.CharField(unique=True, max_length=2)
     name = models.CharField(unique=True, max_length=13)
     geonames_id = models.IntegerField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_continents')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_continents')
@@ -118,7 +117,7 @@ class CountryCodes(models.Model):
 class CountryCurrency(models.Model):
     country = models.ForeignKey(Country, models.DO_NOTHING)
     currency = models.ForeignKey('Currency', models.DO_NOTHING)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_country_currencies')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_country_currencies')
@@ -129,10 +128,9 @@ class CountryCurrency(models.Model):
 
 
 class Currency(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     code = models.CharField(max_length=10)
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_currencies')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_currencies')
@@ -142,12 +140,11 @@ class Currency(models.Model):
 
 
 class Language(models.Model):
-    id = models.PositiveSmallIntegerField(primary_key=True)
     iso_639_3 = models.CharField(max_length=3, blank=True, null=True)
     iso_639_2 = models.CharField(max_length=11, blank=True, null=True)
     iso_639_1 = models.CharField(max_length=2, blank=True, null=True)
     name = models.CharField(max_length=58, blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_languages')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_languages')
@@ -161,7 +158,7 @@ class LanguageVariant(models.Model):
     iso_639_1 = models.CharField(max_length=14, blank=True, null=True)
     language_code = models.CharField(max_length=4, blank=True, null=True)
     territory = models.CharField(max_length=3, blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_language_variants')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_language_variants')
@@ -178,7 +175,7 @@ class Location(models.Model):
     latitude = models.DecimalField(max_digits=12, decimal_places=3)
     longitude = models.DecimalField(max_digits=12, decimal_places=3)
     elevation = models.DecimalField(max_digits=12, decimal_places=5, blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_locations')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_locations')
@@ -190,7 +187,7 @@ class Location(models.Model):
 class LocationAddress(models.Model):
     location = models.ForeignKey(Location, models.DO_NOTHING)
     address_component = models.ForeignKey(AddressComponent, models.DO_NOTHING)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_addresses')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_addresses')
@@ -203,7 +200,7 @@ class LocationAddress(models.Model):
 class LocationType(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_type')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_type')
@@ -215,7 +212,7 @@ class LocationType(models.Model):
 class LocationTypes(models.Model):
     location_type = models.ForeignKey(LocationType, models.DO_NOTHING)
     location = models.ForeignKey(Location, models.DO_NOTHING)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_types')
@@ -245,7 +242,6 @@ class Venue(models.Model):
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=20, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
