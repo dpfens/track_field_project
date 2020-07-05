@@ -16,9 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from track_field_project.admin.site import advanced_admin
+from track_field_project import views
 
 
 urlpatterns = [
+    path(r'', views.IndexView.as_view(), name='home'),
+    path('pages/', include('django.contrib.flatpages.urls')),
     path('account/', include('identity.urls')),
     path('admin/', admin.site.urls),
     path('advanced-admin/', advanced_admin.urls)

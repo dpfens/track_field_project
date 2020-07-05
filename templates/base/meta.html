@@ -1,0 +1,13 @@
+{% load static %}
+
+{# Cloudinary tags #}
+<meta name="cloudinary_cloud_name" content="{{ cloudinary_cloud_name }}">
+
+{# Open Graph Tags #}
+<meta property="og:url" content="{{ request.get_full_path }}" />
+<meta property="og:site_name" content="Doug Fenstermacher">
+{% if twitter %}
+<meta name="twitter:creator" content="@{{ twitter.username }}" />
+<meta name="twitter:site" content="@{{ twitter.username }}" />
+{% endif %}
+<meta property="fb:app_id" content="" />

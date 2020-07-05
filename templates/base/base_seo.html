@@ -1,0 +1,16 @@
+{% extends "base/base.html" %}
+
+{% block head %}
+{% include "base/meta.html" with twitter=twitter %}
+{% block opengraph %}
+{% endblock %}
+{% include "base/rendering.html" %}
+
+<meta name="google-site-verification" content="P1HOOUhwgKai2-_NggPPNFe9DBjAdYz1-dVsIuHfdtc" />
+<link rel="canonical" href="{{ request.build_absolute_uri }}" />
+{% if debug %}<meta name="robots" content="noindex,nofollow,noarchive"/>{% endif %}
+<script type="application/ld+json">{% block breadcrumbs %}{% endblock %}</script>
+{% if structured_data %}
+<script type="application/ld+json">{{structured_data | safe }}</script>
+{% endif %}
+{% endblock %}
