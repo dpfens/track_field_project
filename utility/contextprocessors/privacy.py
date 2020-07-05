@@ -1,4 +1,4 @@
-def privacy(request):
+def dnt(request):
     do_not_track = request.session.get('DNT', None)
     if do_not_track is None:
         do_not_track = request.headers.get('DNT', 0)

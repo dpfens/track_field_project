@@ -57,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
+    'identity.middleware.IdentityMiddleware',
+    'analytics.middleware.RequestLoggingMiddleware'
 ]
 
 ROOT_URLCONF = 'track_field_project.urls'
@@ -72,9 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'utility.context_processors.privacy',
-                # 'identity.context_processors.identity',
-                # 'analytics.context_processors.log_request',
+                'utility.contextprocessors.privacy.dnt',
             ],
         },
     },
