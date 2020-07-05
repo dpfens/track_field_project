@@ -6,7 +6,10 @@
 {% endblock %}
 {% include "base/rendering.html" %}
 
-<meta name="google-site-verification" content="P1HOOUhwgKai2-_NggPPNFe9DBjAdYz1-dVsIuHfdtc" />
+{% if google_site_verification_code %}
+<meta name="google-site-verification" content="{{ google_site_verification_code }}" />
+{% endif %}
+
 <link rel="canonical" href="{{ request.build_absolute_uri }}" />
 {% if debug %}<meta name="robots" content="noindex,nofollow,noarchive"/>{% endif %}
 <script type="application/ld+json">{% block breadcrumbs %}{% endblock %}</script>
