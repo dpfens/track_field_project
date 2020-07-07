@@ -2,8 +2,10 @@ from django import forms
 import models
 
 
-class FeedbackForm(forms.ModelForm):
+class GenericFeedbackForm(forms.Form):
+    feedback_type = models.ModelChoiceField(queryset=models.FeedbackType.objects.all())
+    content = models.TextField()
 
-    class Meta:
-        model = models.Feedback
-        fields = ('content', 'feedback_type')
+
+class AnonymousFeedbackForm(GenericFeedbackForm):
+    email_address = forms.CharField(max_length=100)

@@ -4,6 +4,7 @@ from django.db import models
 # Create your models here.
 class Feedback(models.Model):
     identity = models.ForeignKey('identity.Identity', on_delete=models.DO_NOTHING, null=True)
+    email_address = models.CharField(max_length=100, null=True)
     url = models.CharField(max_length=250)
     feedback_type = models.ForeignKey('FeedbackType', on_delete=models.CASCADE)
     content = models.TextField()
