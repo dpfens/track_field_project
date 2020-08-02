@@ -17,8 +17,7 @@ class Migration(migrations.Migration):
     ]
 
     def add_sport_types(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         sport_types = ['Cardiovascular', 'Strength']
@@ -55,8 +54,7 @@ class Migration(migrations.Migration):
 
 
     def add_sports(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         data = [
@@ -87,8 +85,7 @@ class Migration(migrations.Migration):
 
 
     def add_disciplines(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         names = ['Sprints', 'Middle/Long', 'Hurdles', 'Road Running', 'Jumps', 'Throws', 'Combined', 'Relay', 'Cross Country', 'Mountain Running', 'Ultra Running']
@@ -103,8 +100,7 @@ class Migration(migrations.Migration):
                 instance.save()
 
     def add_events(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         events = [{"discipline_id":"1", "name":"High Jump"},
@@ -644,28 +640,69 @@ class Migration(migrations.Migration):
 
 
     def add_annotation_types(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
-    def add_performance_states(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+    def add_outcome_states(apps, schema_editor):
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
-        performance_states = [
+        states = [
+            {"code":"CPLT", "name": "Complete"},
+            {"code":"DQ", "name":"Disqualified"},
+            {"code":"DNS", "name":"Did Not Start"},
+            {"code":"SCR", "name":"Scratch"},
+            {"code":"DNC", "name":"Did Not Compete"},
+        ]
+
+        for state in states:
+            code = state['code']
+            name = state['name']
+            try:
+                instance = athletics.models.OutcomeState.objects.get(code=code, name=name)
+            except Exception:
+                instance = athletics.models.OutcomeState(code=code, name=name, description='', created_by=superuser_identity)
+                instance.save()
+
+    def add_race_outcome_states(apps, schema_editor):
+        superuser = User.objects.filter(is_superuser=True).first()
+        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
+
+        states = [
             {"code":"FINISH", "name":"Finished"},
-            {"code":"ND", "name":"No Distance"},
-            {"code":"FOUL", "name":"FOUL"},
-            {"code":"PASS", "name":"PASS"},
-            {"code":"PPP", "name":"PPP"},
             {"code":"DNF", "name":"Did Not Finish"},
-            {"code":"NH", "name":"No Height"},
             {"code":"FS", "name":"False Start"},
             {"code":"DQ", "name":"Disqualified"},
             {"code":"-", "name":"-"},
             {"code":"DNS", "name":"Did Not Start"},
             {"code":"NT", "name":"No Time (either not available or not known)"},
+            {"code":"SCR", "name":"Scratch"},
+            {"code":"DNC", "name":"Did Not Compete"},
+            {"code":"PB", "name":"Personal Best"},
+            {"code":"SB", "name":"Season Best"}
+        ]
+
+        for state in states:
+            code = state['code']
+            name = state['name']
+            try:
+                instance = athletics.models.RaceOutcomeState.objects.get(code=code, name=name)
+            except Exception:
+                instance = athletics.models.RaceOutcomeState(code=code, name=name, description='', created_by=superuser_identity)
+                instance.save()
+
+    def add_attempt_states(apps, schema_editor):
+        superuser = User.objects.filter(is_superuser=True).first()
+        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
+
+        states = [
+            {"code":"ND", "name":"No Distance"},
+            {"code":"FOUL", "name":"FOUL"},
+            {"code":"PASS", "name":"PASS"},
+            {"code":"PPP", "name":"PPP"},
+            {"code":"NH", "name":"No Height"},
+            {"code":"DQ", "name":"Disqualified"},
+            {"code":"-", "name":"-"},
             {"code":"TP", "name":""},
             {"code":"NP", "name":""},
             {"code":"SCR", "name":"Scratch"},
@@ -675,18 +712,17 @@ class Migration(migrations.Migration):
             {"code":"SB", "name":"Season Best"}
         ]
 
-        for state in performance_states:
+        for state in states:
             code = state['code']
             name = state['name']
             try:
-                instance = athletics.models.PerformanceState.objects.get(code=code, name=name)
+                instance = athletics.models.AttemptState.objects.get(code=code, name=name)
             except Exception:
-                instance = athletics.models.PerformanceState(code=code, name=name, description='', created_by=superuser_identity)
+                instance = athletics.models.AttemptState(code=code, name=name, description='', created_by=superuser_identity)
                 instance.save()
 
     def add_environments(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         environments = ['Indoor', 'Outdoor']
@@ -700,8 +736,7 @@ class Migration(migrations.Migration):
 
 
     def add_legitimacies(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         data = [{"name":"Verified", "description":"The item was verified by the governing organization to be legitimate"},
@@ -716,8 +751,7 @@ class Migration(migrations.Migration):
                 instance.save()
 
     def add_modes(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         modes = ['Run', 'Walk', 'Wheel chair', 'Swim', 'Bike']
@@ -730,23 +764,21 @@ class Migration(migrations.Migration):
                 instance.save()
 
 
-    def add_meet_type(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+    def add_sporting_event_types(apps, schema_editor):
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
-        meet_types = ['Cross Country', 'Track & Field', 'Road Race']
-        for name in meet_types:
+        sporting_event_types = ['Cross Country', 'Track & Field', 'Road Race']
+        for name in sporting_event_types:
             try:
-                instance = athletics.models.MeetType.objects.get(name=name)
+                instance = athletics.models.SportingEventType.objects.get(name=name)
             except Exception:
-                instance = athletics.models.MeetType(name=name, created_by=superuser_identity)
+                instance = athletics.models.SportingEventType(name=name, created_by=superuser_identity)
                 instance.save()
 
 
     def add_social_class(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
         data = [{
             'name': 'Freshman',
@@ -789,8 +821,7 @@ class Migration(migrations.Migration):
         pass
 
     def add_strategies(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         strategies = ['Positive', 'Negative', 'Even', 'Sit and Kick', 'Oscillating']
@@ -802,8 +833,7 @@ class Migration(migrations.Migration):
                 instance.save()
 
     def add_tiers(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
+        superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
 
         tiers = ['Qualifications', 'Quarterfinals', 'Semifinals', 'Finals']
@@ -821,9 +851,11 @@ class Migration(migrations.Migration):
         migrations.RunPython(add_scoring),
         migrations.RunPython(add_tiers),
         migrations.RunPython(add_strategies),
-        migrations.RunPython(add_meet_type),
+        migrations.RunPython(add_sporting_event_types),
         migrations.RunPython(add_environments),
-        migrations.RunPython(add_performance_states),
+        migrations.RunPython(add_outcome_states),
+        migrations.RunPython(add_race_outcome_states),
+        migrations.RunPython(add_attempt_states),
         migrations.RunPython(add_disciplines),
         migrations.RunPython(add_events),
         migrations.RunPython(add_modes),

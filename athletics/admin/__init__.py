@@ -10,19 +10,16 @@ class AnnotationAdmin(admin.ModelAdmin):
     list_select_related = ('annotation_type', )
 
 
-@admin.register(models.AnnotationAttemptSequential, site=advanced_admin)
-class AnnotationAttemptSequentialAdmin(admin.ModelAdmin):
-    list_display = ('sequence', )
-
-
-@admin.register(models.AnnotationAttemptThreshold, site=advanced_admin)
-class AnnotationAttemptThresholdAdmin(admin.ModelAdmin):
-    list_display = ('sequence', )
+@admin.register(models.AnnotationAttempt, site=advanced_admin)
+class AnnotationAttemptAdmin(admin.ModelAdmin):
+    list_display = ('attempt', 'sequence', )
+    list_select_related = ('attempt', )
 
 
 @admin.register(models.AnnotationSplit, site=advanced_admin)
 class AnnotationSplitAdmin(admin.ModelAdmin):
-    list_display = ('cumulative_distance', 'distance', 'cumulative_time', 'time')
+    list_display = ('race_outcome', 'cumulative_distance', 'distance', 'cumulative_time', 'time')
+    list_select_related = ('race_outcome', )
 
 
 @admin.register(models.AnnotationType, site=advanced_admin)
@@ -37,7 +34,13 @@ class AnnotationVoteAdmin(admin.ModelAdmin):
 
 @admin.register(models.Attempt, site=advanced_admin)
 class AttemptAdmin(admin.ModelAdmin):
-    list_display = ('identity', 'heat', 'performance', 'state', 'value', 'wind')
+    list_display = ('type', 'identity', 'outcome', 'sequence', 'state', 'value', 'wind')
+    list_select_related = ('type', 'identity', 'outcome', 'state')
+
+
+@admin.register(models.AttemptState, site=advanced_admin)
+class AttemptStateAdmin(admin.ModelAdmin):
+    list_display = ('code', 'name')
 
 
 @admin.register(models.Category, site=advanced_admin)
@@ -64,8 +67,8 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(models.Competition, site=advanced_admin)
 class CompetitionAdmin(admin.ModelAdmin):
-    list_display = ('division', 'meet_instance')
-    list_select_related = ('division', 'meet_instance')
+    list_display = ('division', 'sporting_event')
+    list_select_related = ('division', 'sporting_event')
 
 
 @admin.register(models.CompetitionSimilarity, site=advanced_admin)
@@ -134,26 +137,15 @@ class EventWeightAdmin(admin.ModelAdmin):
     list_select_related = ('event', 'weight_unit')
 
 
+@admin.register(models.FieldOfPlay, site=advanced_admin)
+class FieldOfPlayAdmin(admin.ModelAdmin):
+    list_display = ('name', 'venue')
+
+
 @admin.register(models.Heat, site=advanced_admin)
 class HeatAdmin(admin.ModelAdmin):
-    list_display = ('name', 'competition', 'tier', 'overall')
+    list_display = ('competition', 'tier', 'is_overall', 'name')
     list_select_related = ('competition', 'tier')
-
-
-@admin.register(models.HeatClustering, site=advanced_admin)
-class HeatClusteringAdmin(admin.ModelAdmin):
-    list_display = ('heat', 'fuzzy', 'min_eps', 'max_eps', 'min_points', 'max_points', 'split_distance')
-
-
-@admin.register(models.HeatClusteringAssignments, site=advanced_admin)
-class HeatClusteringAssignmentsgAdmin(admin.ModelAdmin):
-    list_display = ('clustering', 'performance', 'split', 'cluster', 'membership')
-
-
-@admin.register(models.HeatSimilarity, site=advanced_admin)
-class HeatSimilarityAdmin(admin.ModelAdmin):
-    list_display = ('heat', 'other', 'value')
-    list_select_related = ('heat', 'other')
 
 
 @admin.register(models.Legitimacies, site=advanced_admin)
@@ -161,21 +153,15 @@ class LegitimaciesAdmin(admin.ModelAdmin):
     list_display = ('name', )
 
 
-@admin.register(models.Meet, site=advanced_admin)
-class MeetAdmin(admin.ModelAdmin):
-    list_display = ('name', 'meet_type', 'environment', 'championship')
-    list_select_related = ('meet_type', 'environment')
+@admin.register(models.SportingEvent, site=advanced_admin)
+class SportingEventAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sporting_event_type', 'environment', 'championship')
+    list_select_related = ('sporting_event_type', 'environment')
 
 
-@admin.register(models.MeetInstance, site=advanced_admin)
-class MeetInstanceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'timing_system', 'meet', 'venue')
-    list_select_related = ('meet', 'venue', 'timing_system', )
-
-
-@admin.register(models.MeetInstanceReview, site=advanced_admin)
-class MeetInstanceReviewAdmin(admin.ModelAdmin):
-    list_display = ('meet_instance', 'review')
+@admin.register(models.SportingEventReview, site=advanced_admin)
+class SportingEventReviewAdmin(admin.ModelAdmin):
+    list_display = ('sporting_event', 'review')
 
     def clean(self):
         start_date = self.cleaned_data.get('start_date')
@@ -185,8 +171,8 @@ class MeetInstanceReviewAdmin(admin.ModelAdmin):
         return self.cleaned_data
 
 
-@admin.register(models.MeetType, site=advanced_admin)
-class MeetTypeAdmin(admin.ModelAdmin):
+@admin.register(models.SportingEventType, site=advanced_admin)
+class SportingEventTypeAdmin(admin.ModelAdmin):
     list_display = ('name', )
 
 
@@ -195,36 +181,42 @@ class ModeAdmin(admin.ModelAdmin):
     list_display = ('name', )
 
 
-@admin.register(models.Performance, site=advanced_admin)
-class PerformanceAdmin(admin.ModelAdmin):
-    list_display = ('heat', 'identity', 'organization', 'social_class', 'place', 'value', 'state', 'legitimacy')
-    list_select_related = ('heat', 'identity', 'organization')
+@admin.register(models.Outcome, site=advanced_admin)
+class OutcomeAdmin(admin.ModelAdmin):
+    list_display = ('identity', 'organization', 'place', 'value', 'legitimacy')
+    list_select_related = ('identity', 'organization')
 
 
-@admin.register(models.PerformanceAnnotation, site=advanced_admin)
-class PerformanceAnnotationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'annotation_type', 'performance')
-    list_select_related = ('user', 'annotation_type', 'performance')
+@admin.register(models.OutcomeAnnotation, site=advanced_admin)
+class OutcomeAnnotationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'annotation_type', 'outcome')
+    list_select_related = ('user', 'annotation_type', 'outcome')
 
 
-@admin.register(models.PerformanceSimilarity, site=advanced_admin)
-class PerformanceSimilarityAdmin(admin.ModelAdmin):
-    list_display = ('performance', 'other', 'value')
+@admin.register(models.OutcomeSimilarity, site=advanced_admin)
+class OutcomeSimilarityAdmin(admin.ModelAdmin):
+    list_display = ('outcome', 'other', 'value')
 
 
-@admin.register(models.PerformanceState, site=advanced_admin)
-class PerformanceStateAdmin(admin.ModelAdmin):
+@admin.register(models.OutcomeState, site=advanced_admin)
+class OutcomeStateAdmin(admin.ModelAdmin):
     list_display = ('code', 'name')
 
 
-@admin.register(models.RelayMember, site=advanced_admin)
-class RelayMembersAdmin(admin.ModelAdmin):
-    list_display = ('relay', 'identity', 'is_alternate')
+@admin.register(models.RaceOutcome, site=advanced_admin)
+class RaceOutcomeAdmin(admin.ModelAdmin):
+    list_display = ('outcome', 'heat', 'mode', 'state')
+    list_select_related = ('outcome', 'heat', 'mode', 'state')
 
 
-@admin.register(models.RelaySplit, site=advanced_admin)
-class RelaySplitAdmin(admin.ModelAdmin):
-    list_display = ('performance', 'identity', 'leg', 'cumulative_distance', 'distance', 'leg_distance', 'cumulative_time', 'time', 'leg_time')
+@admin.register(models.RaceOutcomeState, site=advanced_admin)
+class RaceOutcomeStateAdmin(admin.ModelAdmin):
+    list_display = ('code', 'name')
+
+
+@admin.register(models.RelayOrder, site=advanced_admin)
+class RelayOrderAdmin(admin.ModelAdmin):
+    list_display = ('race_outcome', 'identity', 'sequence', 'distance')
 
 
 @admin.register(models.Review, site=advanced_admin)
@@ -267,9 +259,9 @@ class SeriesHierarchyAdmin(admin.ModelAdmin):
     list_display = ('parent', 'child')
 
 
-@admin.register(models.SeriesMeet, site=advanced_admin)
-class SeriesMeetAdmin(admin.ModelAdmin):
-    list_display = ('meet', 'series')
+@admin.register(models.SeriesSportingEvent, site=advanced_admin)
+class SeriesSportingEventAdmin(admin.ModelAdmin):
+    list_display = ('sporting_event', 'series')
 
 
 @admin.register(models.SocialClass, site=advanced_admin)
@@ -284,7 +276,7 @@ class SocialClassAliasAdmin(admin.ModelAdmin):
 
 @admin.register(models.Split, site=advanced_admin)
 class SplitAdmin(admin.ModelAdmin):
-    list_display = ('performance', 'cumulative_distance', 'distance', 'cumulative_time', 'time')
+    list_display = ('race_outcome', 'cumulative_distance', 'distance', 'cumulative_time', 'time')
 
 
 @admin.register(models.SponsorshipAthlete, site=advanced_admin)

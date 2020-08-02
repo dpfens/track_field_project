@@ -1,13 +1,14 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 
+
 # Create your models here.
 class Annotation(models.Model):
     id = models.BigAutoField(primary_key=True)
     annotation_type = models.ForeignKey('AnnotationType', models.DO_NOTHING)
     content = models.TextField()
-    is_public = models.IntegerField()
-    is_verified = models.IntegerField()
+    is_public = models.BooleanField()
+    is_verified = models.BooleanField()
     verified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='verified_by', blank=True, null=True)
     verified_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -19,7 +20,7 @@ class Annotation(models.Model):
         db_table = 'annotation'
 
 
-class AnnotationAttemptSequential(models.Model):
+class AnnotationAttempt(models.Model):
     attempt = models.ForeignKey('Attempt', models.DO_NOTHING)
     sequence = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -28,23 +29,11 @@ class AnnotationAttemptSequential(models.Model):
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_sequential_attempt_annotations')
 
     class Meta:
-        db_table = 'annotation_attempt_sequential'
-
-
-class AnnotationAttemptThreshold(models.Model):
-    attempt = models.ForeignKey('Attempt', models.DO_NOTHING)
-    sequence = models.CharField(max_length=6)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_threshold_attempt_annotations')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_threshold_attempt_annotations')
-
-    class Meta:
-        db_table = 'annotation_attempt_threshold'
+        db_table = 'annotation_attempt'
 
 
 class AnnotationSplit(models.Model):
-    performance = models.ForeignKey('Performance', models.DO_NOTHING)
+    race_outcome = models.ForeignKey('RaceOutcome', models.DO_NOTHING)
     cumulative_distance = models.DecimalField(max_digits=10, decimal_places=3)
     distance = models.DecimalField(max_digits=10, decimal_places=3)
     cumulative_time = models.DecimalField(max_digits=10, decimal_places=3)
@@ -98,10 +87,11 @@ class Area(models.Model):
 
 
 class Attempt(models.Model):
-    identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    heat = models.ForeignKey('Heat', models.DO_NOTHING)
-    performance = models.ForeignKey('Performance', models.DO_NOTHING)
-    state = models.ForeignKey('PerformanceState', models.DO_NOTHING)
+    type = models.ForeignKey('AttemptType', models.DO_NOTHING)
+    identity = models.ForeignKey('identity.Identity', models.CASCADE)
+    outcome = models.ForeignKey('Outcome', models.CASCADE)
+    sequence = models.PositiveIntegerField()
+    state = models.ForeignKey('AttemptState', models.DO_NOTHING)
     value = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     wind = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -113,30 +103,29 @@ class Attempt(models.Model):
         db_table = 'attempt'
 
 
-class AttemptSequential(models.Model):
-    attempt = models.OneToOneField(Attempt, on_delete=models.DO_NOTHING)
-    sequence = models.PositiveIntegerField()
+class AttemptState(models.Model):
+    code = models.CharField(max_length=15)
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_sequential_attempts')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_attempt_states')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_sequential_attempts')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_attempt_states')
 
     class Meta:
-        db_table = 'attempt_sequential'
-        unique_together = (('attempt', 'sequence'),)
+        db_table = 'attempt_state'
 
 
-class AttemptThreshold(models.Model):
-    attempt = models.OneToOneField(Attempt, on_delete=models.DO_NOTHING)
-    sequence = models.CharField(max_length=6)
+class AttemptType(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_attempt_thresholds')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_attempt_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_attempt_thresholds')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_attempt_types')
 
     class Meta:
-        db_table = 'attempt_threshold'
-        unique_together = (('attempt', 'sequence'),)
+        db_table = 'attempt_type'
 
 
 class Category(models.Model):
@@ -164,17 +153,17 @@ class CategoryHierarchy(models.Model):
         unique_together = (('parent', 'child'),)
 
 
-class CategoryMeet(models.Model):
+class CategorySportingEvent(models.Model):
     category = models.ForeignKey(Category, models.DO_NOTHING)
-    meet = models.ForeignKey('Meet', models.DO_NOTHING)
+    sporting_event = models.ForeignKey('SportingEvent', models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_category_meets')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_category_sporting_events')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_category_meets')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_category_sporting_events')
 
     class Meta:
-        db_table = 'category_meet'
-        unique_together = (('meet', 'category'),)
+        db_table = 'category_sporting_event'
+        unique_together = (('sporting_event', 'category'),)
 
 
 class Coach(models.Model):
@@ -197,7 +186,7 @@ class Comment(models.Model):
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     subject = models.CharField(max_length=255)
     content = models.TextField()
-    is_flagged = models.PositiveIntegerField()
+    is_flagged = models.BooleanField()
     flagged_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='flagged_by', blank=True, null=True, related_name='flagged_comments')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_comments')
@@ -210,7 +199,7 @@ class Comment(models.Model):
 
 class Competition(models.Model):
     competition_type = models.ForeignKey('CompetitionType', models.DO_NOTHING)
-    meet_instance = models.ForeignKey('MeetInstance', models.DO_NOTHING)
+    sporting_event = models.ForeignKey('SportingEvent', models.DO_NOTHING)
     division = models.ForeignKey('Division', models.DO_NOTHING, blank=True, null=True)
     sport = models.ForeignKey('Sport', models.DO_NOTHING)
     field_of_play = models.ForeignKey('FieldOfPlay', models.DO_NOTHING, blank=True, null=True)
@@ -233,7 +222,7 @@ class Competition(models.Model):
 
     class Meta:
         db_table = 'competition'
-        unique_together = (('meet_instance', 'slug'),)
+        unique_together = (('sporting_event', 'slug'),)
 
 
 class CompetitionEvent(models.Model):
@@ -503,11 +492,10 @@ class FieldOfPlay(models.Model):
 
 
 class Heat(models.Model):
-    competition = models.ForeignKey(Competition, models.DO_NOTHING)
+    competition = models.ForeignKey(Competition, models.CASCADE)
     tier = models.ForeignKey('Tier', models.DO_NOTHING)
-    overall = models.IntegerField()
-    name = models.CharField(max_length=75)
-    description = models.CharField(max_length=100)
+    is_overall = models.BooleanField()
+    name = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_heats')
     last_modified_at = models.DateTimeField(blank=True, null=True)
@@ -515,57 +503,6 @@ class Heat(models.Model):
 
     class Meta:
         db_table = 'heat'
-        unique_together = (('competition', 'tier', 'name'),)
-
-
-class HeatClustering(models.Model):
-    heat = models.ForeignKey(Heat, models.DO_NOTHING)
-    split_distance = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    id = models.PositiveIntegerField(primary_key=True)
-    min_eps = models.DecimalField(max_digits=10, decimal_places=3)
-    max_eps = models.DecimalField(max_digits=10, decimal_places=3)
-    min_points = models.PositiveIntegerField()
-    max_points = models.PositiveIntegerField()
-    fuzzy = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_heat_clusterings')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_heat_clusterings')
-
-    class Meta:
-        db_table = 'heat_clustering'
-        unique_together = (('heat', 'id', 'min_eps', 'min_points', 'max_eps', 'max_points', 'fuzzy'),)
-
-
-class HeatClusteringAssignments(models.Model):
-    clustering = models.ForeignKey(HeatClustering, models.DO_NOTHING)
-    performance = models.ForeignKey('Performance', models.DO_NOTHING)
-    split = models.ForeignKey('Split', models.DO_NOTHING, blank=True, null=True)
-    cluster = models.IntegerField()
-    membership = models.DecimalField(max_digits=4, decimal_places=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_heat_clustering_assignments')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_heat_clustering_assignments')
-
-    class Meta:
-        db_table = 'heat_clustering_assignments'
-        unique_together = (('clustering', 'performance', 'cluster'),)
-
-
-class HeatSimilarity(models.Model):
-    heat = models.OneToOneField(Heat, on_delete=models.DO_NOTHING, related_name='similar_heats')
-    other = models.ForeignKey(Heat, models.DO_NOTHING, related_name='other_similar_heats')
-    value = models.DecimalField(max_digits=4, decimal_places=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_heat_similarities')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_heat_similarities')
-
-    class Meta:
-        db_table = 'heat_similarity'
-        unique_together = (('heat', 'other'),)
-        verbose_name_plural = 'heat similarities'
 
 
 class Legitimacies(models.Model):
@@ -584,95 +521,70 @@ class Legitimacies(models.Model):
         verbose_name_plural = 'legitimacies'
 
 
-class Meet(models.Model):
-    meet_type = models.ForeignKey('MeetType', models.DO_NOTHING)
+class SportingEvent(models.Model):
+    sporting_event_type = models.ForeignKey('SportingEventType', models.DO_NOTHING)
+    timing_system = models.ForeignKey('TimingSystem', models.DO_NOTHING, blank=True, null=True)
     environment = models.ForeignKey(Environment, models.DO_NOTHING)
     organization = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True)
     division = models.ForeignKey(Division, models.DO_NOTHING, blank=True, null=True)
+    venue = models.ForeignKey('geography.Venue', models.DO_NOTHING)
+    organizer = models.ForeignKey('identity.Identity', models.DO_NOTHING, null=True, related_name='organized_sporting_events')
     name = models.CharField(max_length=100)
     slug = models.CharField(unique=True, max_length=100)
     description = models.CharField(max_length=255)
-    championship = models.IntegerField()
-    expected_competitiveness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
-    actual_competitiveness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
-    expected_eliteness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
-    actual_eliteness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_meets')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_meets')
-    categories = models.ManyToManyField(Category, through=CategoryMeet)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super(Meet, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'meet'
-
-
-class MeetInstance(models.Model):
-    timing_system = models.ForeignKey('TimingSystem', models.DO_NOTHING, blank=True, null=True)
-    meet = models.ForeignKey(Meet, models.DO_NOTHING)
-    venue = models.ForeignKey('geography.Venue', models.DO_NOTHING)
-    organizer = models.ForeignKey('identity.Identity', models.DO_NOTHING, null=True, related_name='organized_meet_instances')
-    name = models.CharField(max_length=100)
-    slug = models.CharField(unique=True, max_length=100)
     start_date = models.DateField()
     end_date = models.DateField()
     url = models.CharField(max_length=500)
+    championship = models.BooleanField()
     participants = models.PositiveIntegerField()
     expected_competitiveness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
     actual_competitiveness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
     expected_eliteness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
     actual_eliteness = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_meet_instances')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_sporting_events')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_meet_instances', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_sporting_events', blank=True, null=True)
+    categories = models.ManyToManyField(Category, through=CategorySportingEvent)
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        super(MeetInstance, self).save(*args, **kwargs)
+        super(SportingEvent, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        db_table = 'meet_instance'
+        db_table = 'sporting_event'
 
 
-class MeetInstanceReview(models.Model):
-    meet_instance = models.OneToOneField(MeetInstance, on_delete=models.DO_NOTHING)
+class SportingEventReview(models.Model):
+    sporting_event = models.OneToOneField(SportingEvent, on_delete=models.DO_NOTHING)
     review = models.ForeignKey('Review', models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_meet_instance_reviews')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_sporting_event_reviews')
     last_modified_at = models.DateTimeField()
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_meet_instance_reviews')
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_sporting_event_reviews')
 
     class Meta:
-        db_table = 'meet_instance_review'
-        unique_together = (('meet_instance', 'review'),)
+        db_table = 'sporting_event_review'
+        unique_together = (('sporting_event', 'review'),)
 
 
-class MeetType(models.Model):
+class SportingEventType(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_meet_types')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_sporting_event_types')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_meet_types', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_sporting_event_types', blank=True, null=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        db_table = 'meet_type'
+        db_table = 'sporting_event_type'
 
 
 class Mode(models.Model):
@@ -690,79 +602,28 @@ class Mode(models.Model):
         db_table = 'mode'
 
 
-class Performance(models.Model):
+class Outcome(models.Model):
+    type = models.ForeignKey('OutcomeType', models.DO_NOTHING, null=True)
     field_of_play = models.ForeignKey(FieldOfPlay, models.DO_NOTHING)
     competition = models.ForeignKey(Competition, models.DO_NOTHING)
-    heat = models.ForeignKey(Heat, models.DO_NOTHING)
-    mode = models.ForeignKey(Mode, models.DO_NOTHING)
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='performances')
-    organization = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True, related_name='organization_performances')
-    social_class = models.ForeignKey('SocialClass', models.DO_NOTHING, blank=True, null=True)
-    squad = models.CharField(max_length=1, blank=True, null=True)
+    organization = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True, related_name='organization_outcomes')
     place = models.PositiveSmallIntegerField()
-    points = models.SmallIntegerField(blank=True, null=True)
-    bib = models.PositiveIntegerField(blank=True, null=True)
     value = models.DecimalField(max_digits=12, decimal_places=4)
-    reaction_time = models.DecimalField(max_digits=6, decimal_places=4, blank=True, null=True)
-    wind = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
-    unattached = models.IntegerField(blank=True, null=True)
-    state = models.ForeignKey('PerformanceState', models.DO_NOTHING)
-    strategy = models.ForeignKey('Strategy', models.DO_NOTHING, blank=True, null=True)
+    unit = models.ForeignKey('utility.Unit', models.DO_NOTHING)
+    state = models.ForeignKey('OutcomeState', models.DO_NOTHING)
     legitimacy = models.ForeignKey(Legitimacies, models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_outcomes')
     last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_outcomes', blank=True, null=True)
 
     class Meta:
-        db_table = 'performance'
-        unique_together = (('heat', 'organization', 'identity', 'squad', 'value', 'state'),)
+        db_table = 'outcome'
+        unique_together = (('competition', 'identity', ), )
 
 
-class PerformanceAgeGroup(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    performance = models.OneToOneField(Performance, models.DO_NOTHING)
-    min_age = models.PositiveIntegerField()
-    max_age = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_performance_age_groups')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_performance_age_groups')
-
-    class Meta:
-        db_table = 'performance_age_group'
-
-
-class PerformanceAnnotation(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    performance = models.ForeignKey(Performance, models.DO_NOTHING)
-    annotation_type = models.ForeignKey(AnnotationType, models.DO_NOTHING)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'performance_annotation'
-
-
-class PerformanceSimilarity(models.Model):
-    performance = models.OneToOneField(Performance, on_delete=models.DO_NOTHING)
-    other = models.ForeignKey(Performance, models.DO_NOTHING, related_name='%(class)s_other')
-    value = models.DecimalField(max_digits=4, decimal_places=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'performance_similarity'
-        unique_together = (('performance', 'other'),)
-
-
-class PerformanceState(models.Model):
+class OutcomeState(models.Model):
     code = models.CharField(unique=True, max_length=10)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
@@ -775,13 +636,122 @@ class PerformanceState(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'performance_state'
+        db_table = 'outcome_state'
+
+
+class OutcomeType(models.Model):
+    name = models.CharField(unique=True, max_length=50)
+    description = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_outcome_types')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_outcome_types', blank=True, null=True)
+
+    class Meta:
+        db_table = 'outcome_type'
+
+
+class OutcomeAgeGroup(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    outcome = models.OneToOneField(Outcome, models.DO_NOTHING)
+    min_age = models.PositiveIntegerField()
+    max_age = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_performance_age_groups')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_performance_age_groups')
+
+    class Meta:
+        db_table = 'outcome_age_group'
+
+
+class OutcomeAnnotation(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    outcome = models.ForeignKey(Outcome, models.DO_NOTHING)
+    annotation_type = models.ForeignKey(AnnotationType, models.DO_NOTHING)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    class Meta:
+        db_table = 'outcome_annotation'
+
+
+class OutcomeSimilarity(models.Model):
+    outcome = models.OneToOneField(Outcome, on_delete=models.DO_NOTHING)
+    other = models.ForeignKey(Outcome, models.DO_NOTHING, related_name='%(class)s_other')
+    value = models.DecimalField(max_digits=4, decimal_places=3)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    class Meta:
+        db_table = 'outcome_similarity'
+        unique_together = (('outcome', 'other'),)
+
+
+class RaceOutcome(models.Model):
+    outcome = models.OneToOneField(Outcome, models.CASCADE)
+    heat = models.ForeignKey(Heat, models.CASCADE, null=True)
+    mode = models.ForeignKey(Mode, models.DO_NOTHING)
+    social_class = models.ForeignKey('SocialClass', models.DO_NOTHING, blank=True, null=True)
+    squad = models.CharField(max_length=1, blank=True, null=True)
+    points = models.SmallIntegerField(blank=True, null=True)
+    bib = models.PositiveIntegerField(blank=True, null=True)
+    reaction_time = models.DecimalField(max_digits=6, decimal_places=4, blank=True, null=True)
+    wind = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
+    unattached = models.BooleanField()
+    state = models.ForeignKey('RaceOutcomeState', models.DO_NOTHING)
+    strategy = models.ForeignKey('Strategy', models.DO_NOTHING, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_race_outcomes')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='last_modified_race_outcomes', blank=True, null=True)
+
+    class Meta:
+        db_table = 'race_outcome'
+
+
+class RaceOutcomeState(models.Model):
+    code = models.CharField(unique=True, max_length=10)
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'race_outcome_state'
+
+
+class RelayOrder(models.Model):
+    race_outcome = models.ForeignKey('RaceOutcome', models.CASCADE)
+    identity = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_orders')
+    sequence = models.SmallIntegerField()
+    distance = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
+    last_modified_at = models.DateTimeField(blank=True, null=True)
+    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    class Meta:
+        db_table = 'relay_order'
+        unique_together = (('race_outcome', 'identity', 'sequence'),)
+        verbose_name_plural = 'relay orders'
 
 
 class RelayMember(models.Model):
     relay = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_members')
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relays')
-    is_alternate = models.PositiveIntegerField()
+    is_alternate = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
@@ -792,42 +762,6 @@ class RelayMember(models.Model):
         db_table = 'relay_member'
         unique_together = (('relay', 'identity'),)
         verbose_name_plural = 'relay members'
-
-
-class RelayPerformanceParticipant(models.Model):
-    relay = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    member = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_memberships')
-    performance = models.ForeignKey(Performance, models.DO_NOTHING)
-    sequence = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_relay_participant_performance')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_relay_participant_performance')
-
-    class Meta:
-        db_table = 'relay_performance_participant'
-        unique_together = (('performance', 'relay', 'member'),)
-        verbose_name_plural = 'relay performance participants'
-
-
-class RelaySplit(models.Model):
-    performance = models.ForeignKey(Performance, models.DO_NOTHING)
-    identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    leg = models.PositiveIntegerField()
-    cumulative_distance = models.DecimalField(max_digits=10, decimal_places=3)
-    distance = models.DecimalField(max_digits=10, decimal_places=3)
-    leg_distance = models.DecimalField(max_digits=10, decimal_places=3)
-    cumulative_time = models.DecimalField(max_digits=10, decimal_places=3)
-    time = models.DecimalField(max_digits=10, decimal_places=3)
-    leg_time = models.DecimalField(max_digits=10, decimal_places=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'relay_split'
-        unique_together = (('performance', 'identity'),)
 
 
 class Review(models.Model):
@@ -970,17 +904,17 @@ class SeriesHierarchy(models.Model):
         unique_together = (('parent', 'child'),)
 
 
-class SeriesMeet(models.Model):
+class SeriesSportingEvent(models.Model):
     series = models.OneToOneField(Series, on_delete=models.DO_NOTHING)
-    meet = models.ForeignKey(Meet, on_delete=models.DO_NOTHING)
+    sporting_event = models.ForeignKey(SportingEvent, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        db_table = 'series_meet'
-        unique_together = (('series', 'meet'),)
+        db_table = 'series_sporting_event'
+        unique_together = (('series', 'sporting_event'),)
 
 
 class SocialClass(models.Model):
@@ -1016,7 +950,7 @@ class SocialClassAlias(models.Model):
 
 
 class Split(models.Model):
-    performance = models.OneToOneField(Performance, on_delete=models.DO_NOTHING)
+    race_outcome = models.OneToOneField(RaceOutcome, on_delete=models.DO_NOTHING)
     cumulative_distance = models.DecimalField(max_digits=10, decimal_places=3)
     distance = models.DecimalField(max_digits=10, decimal_places=3)
     cumulative_time = models.DecimalField(max_digits=10, decimal_places=3)
@@ -1050,7 +984,7 @@ class SponsorshipCompetition(models.Model):
     competition = models.ForeignKey(Competition, models.DO_NOTHING)
     amount = models.FloatField()
     start_date = models.DateField()
-    end_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
@@ -1094,248 +1028,6 @@ class SportType(models.Model):
         db_table = 'sport_type'
 
 
-class StagingAttempt(models.Model):
-    identity = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
-    heat_id = models.PositiveIntegerField()
-    performance = models.ForeignKey('StagingPerformance', models.DO_NOTHING)
-    state = models.ForeignKey(PerformanceState, models.DO_NOTHING)
-    value = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    wind = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'staging_attempt'
-
-
-class StagingAttemptSequential(models.Model):
-    attempt = models.OneToOneField(StagingAttempt, on_delete=models.DO_NOTHING)
-    sequence = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'staging_attempt_sequential'
-        unique_together = (('attempt', 'sequence'),)
-
-
-class StagingAttemptThreshold(models.Model):
-    attempt = models.OneToOneField(StagingAttempt, on_delete=models.DO_NOTHING)
-    sequence = models.CharField(max_length=6)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'staging_attempt_threshold'
-        unique_together = (('attempt', 'sequence'),)
-
-
-class StagingCompetition(models.Model):
-    staging_meet_instance = models.ForeignKey('StagingMeetInstance', models.DO_NOTHING)
-    staging_division = models.ForeignKey(Division, models.DO_NOTHING)
-    event = models.ForeignKey(Event, models.DO_NOTHING, related_name='staging_competition',)
-    subevent = models.ForeignKey(Event, models.DO_NOTHING, related_name='staging_subcompetition', blank=True, null=True)
-    mode = models.ForeignKey(Mode, models.DO_NOTHING, blank=True, null=True)
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    date = models.DateField()
-    url = models.CharField(max_length=255)
-    source = models.CharField(max_length=20)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'staging_competition'
-
-
-class StagingEntity(models.Model):
-    entity_type = models.ForeignKey('identity.EntityType', models.DO_NOTHING)
-    name = models.CharField(max_length=150)
-    knowledge_graph = models.ForeignKey('utility.KnowledgeGraph', models.DO_NOTHING)
-    website = models.CharField(max_length=50, blank=True, null=True)
-    url = models.CharField(max_length=500, blank=True, null=True)
-    source = models.CharField(max_length=20)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'staging_entity'
-
-
-class StagingHeat(models.Model):
-    staging_competition = models.ForeignKey(Competition, models.DO_NOTHING)
-    staging_tier = models.ForeignKey('Tier', models.DO_NOTHING)
-    overall = models.IntegerField()
-    name = models.CharField(max_length=75)
-    description = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'staging_heat'
-        unique_together = (('staging_competition', 'staging_tier', 'name'),)
-
-
-class StagingMeet(models.Model):
-    meet_type = models.ForeignKey(MeetType, models.DO_NOTHING)
-    environment = models.ForeignKey(Environment, models.DO_NOTHING)
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=255)
-    championship = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'staging_meet'
-
-
-class StagingMeetInstance(models.Model):
-    timing_system_id = models.PositiveIntegerField(blank=True, null=True)
-    staging_meet = models.ForeignKey(StagingMeet, models.DO_NOTHING)
-    staging_venue = models.ForeignKey('StagingVenue', models.DO_NOTHING)
-    name = models.CharField(max_length=100)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    url = models.CharField(max_length=500)
-    source = models.CharField(max_length=20)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'staging_meet_instance'
-
-
-class StagingPerformance(models.Model):
-    staging_heat = models.ForeignKey(StagingHeat, models.DO_NOTHING)
-    staging_identity_id = models.PositiveIntegerField()
-    staging_organization_id = models.PositiveIntegerField(blank=True, null=True)
-    social_class = models.ForeignKey(SocialClass, models.DO_NOTHING, blank=True, null=True)
-    squad = models.CharField(max_length=1, blank=True, null=True)
-    place = models.PositiveSmallIntegerField()
-    points = models.SmallIntegerField()
-    value = models.DecimalField(max_digits=12, decimal_places=4)
-    reaction_time = models.DecimalField(max_digits=6, decimal_places=4, blank=True, null=True)
-    wind = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
-    unattached = models.IntegerField(blank=True, null=True)
-    state = models.ForeignKey(PerformanceState, models.DO_NOTHING)
-    strategy = models.ForeignKey('Strategy', models.DO_NOTHING, blank=True, null=True)
-    legitimacy = models.ForeignKey(Legitimacies, models.DO_NOTHING)
-    source = models.CharField(max_length=20)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'staging_performance'
-        unique_together = (('staging_heat', 'staging_organization_id', 'staging_identity_id', 'squad', 'value', 'state'),)
-
-
-class StagingRelayMembers(models.Model):
-    staging_relay = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relays')
-    staging_identity = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relay_memberships')
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'staging_relay_members'
-        unique_together = (('staging_relay', 'staging_identity'),)
-
-
-class StagingRelayPerformanceParticipants(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
-    relay = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
-    member = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING, related_name='staging_relay_member_performances')
-    performance = models.ForeignKey(Performance, models.DO_NOTHING)
-    sequence = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_staging_relay_participants')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='modified_staging_relay_participants')
-
-    class Meta:
-        db_table = 'staging_relay_performance_participants'
-        unique_together = (('performance', 'relay', 'member'),)
-
-
-class StagingRelaySplit(models.Model):
-    staging_performance = models.ForeignKey(StagingPerformance, models.DO_NOTHING)
-    staging_identity = models.ForeignKey('identity.StagingIdentity', models.DO_NOTHING)
-    leg = models.PositiveIntegerField()
-    cumulative_distance = models.DecimalField(max_digits=10, decimal_places=3)
-    distance = models.DecimalField(max_digits=10, decimal_places=3)
-    leg_distance = models.DecimalField(max_digits=10, decimal_places=3)
-    cumulative_time = models.DecimalField(max_digits=10, decimal_places=3)
-    time = models.DecimalField(max_digits=10, decimal_places=3)
-    leg_time = models.DecimalField(max_digits=10, decimal_places=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-
-    class Meta:
-        db_table = 'staging_relay_split'
-        unique_together = (('staging_performance', 'staging_identity'),)
-
-
-class StagingVenue(models.Model):
-    name = models.CharField(max_length=100, blank=True, null=True)
-    address = models.CharField(max_length=300)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    zip_code = models.CharField(max_length=20, blank=True, null=True)
-    country = models.CharField(max_length=100)
-    latitude = models.DecimalField(max_digits=10, decimal_places=8)
-    longitude = models.DecimalField(max_digits=11, decimal_places=8)
-    elevation = models.DecimalField(max_digits=12, decimal_places=8)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'staging_venue'
-
-
 class Strategy(models.Model):
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
@@ -1357,7 +1049,7 @@ class Substances(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     wikipedia_url = models.CharField(max_length=100)
-    is_banned = models.PositiveIntegerField()
+    is_banned = models.BooleanField()
     banned_at = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')

@@ -56,6 +56,7 @@ class Quantity(models.Model):
     class Meta:
         db_table = 'quantity'
 
+
 class Unit(models.Model):
     unit_system = models.ForeignKey('UnitSystem', models.DO_NOTHING)
     quantity = models.ForeignKey(Quantity, models.DO_NOTHING)
