@@ -1,3 +1,6 @@
+from identity import models
+
+
 class IdentityMiddleware(object):
 
     def __init__(self, get_response):
@@ -25,6 +28,6 @@ class IdentityMiddleware(object):
                     identity_type = models.IdentityType.objects.get(name='Anonymous User')
                     identity = models.Identity(identity_type=identity_type, user_id=None, is_private=True, identifier=raw_ip_address, created_by=None)
                     identity.save()
-            request.session['identity'] = identity.idea
+            request.session['identity'] = identity.id
         response = self.get_response(request)
         return response

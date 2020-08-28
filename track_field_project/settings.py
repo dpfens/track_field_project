@@ -59,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
+    'utility.middleware.impersonate.ImpersonationMiddleware',
     'identity.middleware.IdentityMiddleware',
     'analytics.middleware.RequestLoggingMiddleware'
 ]
@@ -78,7 +79,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'utility.contextprocessors.privacy.dnt',
-                'utility.contextprocessors.general.general_info'
+                'utility.contextprocessors.general.general_info',
+                'utility.contextprocessors.impersonate.impersonation'
             ],
         },
     },
