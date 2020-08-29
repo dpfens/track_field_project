@@ -24,6 +24,7 @@ urlpatterns = [
     path(r'', views.IndexView.as_view(), name='home'),
     path('pages/', include('django.contrib.flatpages.urls')),
     path('account/', include('identity.urls')),
+    path('js-settings.js', views.js_settings, name='js_settings'),
     path('admin/', admin.site.urls),
     path('advanced-admin/', advanced_admin.urls),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog')
