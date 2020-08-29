@@ -143,6 +143,16 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "track_field_project"
+    }
+}
 
 LOGGING = {
     "version": 1,
