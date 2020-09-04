@@ -23,13 +23,13 @@ def parse_time(text):
 
 
 def create_entity(name, entity_type, creator, **kwargs):
-    existing_entity = identity_models.Entity.objects.filter(name=name, entity_type=entity_type).all()
+    existing_entity = identity_models.Entity.objects.filter(name=name, entity_type=entity_type).first()
     if not existing_entity:
         website = kwargs.get('website')
         entity = identity_models.Entity(name=name, entity_type=entity_type, knowledge_graph_id=None, website=website, created_by=creator)
         entity.save()
     else:
-        entity = existing_entity[0]
+        entity = existing_entity
 
     aliases = kwargs.get('aliases', [])
     for alias in aliases:
@@ -37,7 +37,7 @@ def create_entity(name, entity_type, creator, **kwargs):
             preferred = 1
         else:
             preferred = 0
-        existing_aliases = identity_models.EntityAlias.objects.filter(entity=entity, name=alias).all()
+        existing_aliases = identity_models.EntityAlias.objects.filter(entity=entity, name=alias).exists()
         if not existing_aliases:
             alias_instance = identity_models.EntityAlias(entity=entity, name=alias, preferred_indicator=preferred, created_by=creator)
             alias_instance.save()
@@ -46,22 +46,22 @@ def create_entity(name, entity_type, creator, **kwargs):
 
 
 def create_identity(entity, id, name, identity_type, creator, **kwargs):
-    existing_identity = identity_models.Identity.objects.filter(name=name, identifier=name, identity_type=identity_type).all()
+    existing_identity = identity_models.Identity.objects.filter(name=name, identifier=name, identity_type=identity_type).first()
     if not existing_identity:
         organization = kwargs.get('organization')
         identity = identity_models.Identity(organization=organization, name=name, identifier=id, identity_type=identity_type, is_private=False, created_by=creator)
         identity.save()
     else:
-        identity = existing_identity[0]
+        identity = existing_identity
 
-    existing_entity_identity = identity_models.EntityIdentity.objects.filter(entity=entity, identity=identity).all()
+    existing_entity_identity = identity_models.EntityIdentity.objects.filter(entity=entity, identity=identity).first()
     if not existing_entity_identity:
         entity_identity = identity_models.EntityIdentity(entity=entity, identity=identity, is_private=False, created_by=creator)
         entity_identity.save()
 
     organization_type = kwargs.get('organization_type')
     if organization_type:
-        existing_identity_organizations = identity_models.IdentityOrganization.objects.filter(identity=identity, organization_type=organization_type).all()
+        existing_identity_organizations = identity_models.IdentityOrganization.objects.filter(identity=identity, organization_type=organization_type).first()
         if not existing_identity_organizations:
             formation_date = kwargs.get('formation_date')
             identity_organization = identity_models.IdentityOrganization(identity=identity, organization_type=organization_type, formation_date=formation_date, created_by=creator)
@@ -154,6 +154,7 @@ class Migration(migrations.Migration):
 
         person_entity_type = identity_models.EntityType.objects.filter(name='Person').first()
         person_identity_type = identity_models.IdentityType.objects.filter(name='Person').first()
+        outcome_type = models.OutcomeType.objects.filter(name='Valid').first()
 
         org_entity_type = identity_models.EntityType.objects.filter(name='Organization').first()
         org_identity_type = identity_models.IdentityType.objects.filter(name='Organization').first()
@@ -216,7 +217,7 @@ class Migration(migrations.Migration):
             outcome = models.Outcome.objects.filter(competition=competition, organization=club_identity, identity=person_identity).first()
             if not outcome:
                 time = parse_time(raw_time)
-                outcome = models.Outcome.objects.create(competition=competition, organization=club_identity, identity=person_identity, field_of_play=field_of_play, value=time, unit=seconds_unit, place=place, state=complete_outcome_state, legitimacy=verified_legitimacy, created_by=superuser_identity)
+                outcome = models.Outcome.objects.create(competition=competition, organization=club_identity, identity=person_identity, field_of_play=field_of_play, value=time, unit=seconds_unit, place=place, state=complete_outcome_state, legitimacy=verified_legitimacy, type=outcome_type, created_by=superuser_identity)
                 models.RaceOutcome.objects.create(outcome=outcome, heat=heat, mode=run_mode, bib=bib, points=None, state=finished_race_outcome_state, unattached=unattached, created_by=superuser_identity)
 
 
@@ -276,6 +277,7 @@ class Migration(migrations.Migration):
         run_mode = models.Mode.objects.filter(name='Run').first()
         event = models.Event.objects.filter(name='4 x 400m Relay').first()
         competition_type = models.CompetitionType.objects.filter(name='Race').first()
+        outcome_type = models.OutcomeType.objects.filter(name='Valid').first()
 
         competition = models.Competition.objects.filter(sporting_event=sporting_event, field_of_play=field_of_play, name='4 x 400m Men', slug='4-400m-men').first()
         scoring = models.Scoring.objects.get(name='Minimization')
@@ -304,7 +306,7 @@ class Migration(migrations.Migration):
 
         outcome = models.Outcome.objects.filter(competition=competition, organization=team_identity, identity=relay_identity).first()
         if not outcome:
-            outcome = models.Outcome.objects.create(competition=competition, organization=team_identity, identity=relay_identity, field_of_play=field_of_play, value=185.5, unit=seconds_unit, place=1, state=complete_outcome_state, legitimacy=verified_legitimacy, created_by=superuser_identity)
+            outcome = models.Outcome.objects.create(competition=competition, organization=team_identity, identity=relay_identity, field_of_play=field_of_play, value=185.5, unit=seconds_unit, place=1, state=complete_outcome_state, legitimacy=verified_legitimacy, type=outcome_type, created_by=superuser_identity)
             race_outcome = models.RaceOutcome.objects.create(outcome=outcome, heat=heat, mode=run_mode, bib=None, points=1, state=finished_race_outcome_state, unattached=False, reaction_time=None, wind=None, created_by=superuser_identity)
 
         athlete_data = [

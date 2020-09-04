@@ -1,5 +1,6 @@
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.urls import reverse
 
 
 # Create your models here.
@@ -220,6 +221,9 @@ class Competition(models.Model):
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_competitions')
 
+    def get_absolute_url(self):
+        return reverse('athletics.views.competition_details', args=[self.sporting_event.slug, self.slug])
+
     class Meta:
         db_table = 'competition'
         unique_together = (('sporting_event', 'slug'),)
@@ -411,7 +415,7 @@ class Division(models.Model):
 
 
 class Environment(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_environments')
@@ -554,6 +558,9 @@ class SportingEvent(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('athletics.views.sportingevent_details', args=[self.sporting_event.slug])
 
     class Meta:
         db_table = 'sporting_event'

@@ -845,6 +845,18 @@ class Migration(migrations.Migration):
                 instance = athletics.models.Tier(name=name, level=level, created_by=superuser_identity)
                 instance.save()
 
+    def add_outcome_types(apps, schema_editor):
+        superuser = User.objects.filter(is_superuser=True).first()
+        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
+
+        names = ['Valid', 'Invalid']
+        for name in names:
+            try:
+                instance = athletics.models.OutcomeType.objects.get(name=name, description='')
+            except Exception:
+                instance = athletics.models.OutcomeType(name=name, description='', created_by=superuser_identity)
+                instance.save()
+
     operations = [
         migrations.RunPython(add_sport_types),
         migrations.RunPython(add_sports),
@@ -861,5 +873,6 @@ class Migration(migrations.Migration):
         migrations.RunPython(add_modes),
         migrations.RunPython(add_legitimacies),
         migrations.RunPython(add_social_class),
-        migrations.RunPython(competition_type)
+        migrations.RunPython(competition_type),
+        migrations.RunPython(add_outcome_types)
     ]

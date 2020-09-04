@@ -9,13 +9,13 @@ from athletics import models as athletics_models
 
 
 def create_entity(name, entity_type, creator, **kwargs):
-    existing_entity = models.Entity.objects.filter(name=name, entity_type=entity_type).all()
+    existing_entity = models.Entity.objects.filter(name=name, entity_type=entity_type).first()
     if not existing_entity:
         website = kwargs.get('website')
-        entity = models.Entity(name=name, entity_type=entity_type, knowledge_graph_id=None, website=website, created_by=creator)
+        entity = models.Entity(name=name, entity_type=entity_type, knowledge_graph_id=None, website=website, created_by=creator, slug=kwargs.get('slug'))
         entity.save()
     else:
-        entity = existing_entity[0]
+        entity = existing_entity
 
     aliases = kwargs.get('aliases', [])
     for alias in aliases:
@@ -23,7 +23,7 @@ def create_entity(name, entity_type, creator, **kwargs):
             preferred = 1
         else:
             preferred = 0
-        existing_aliases = models.EntityAlias.objects.filter(entity=entity, name=alias).all()
+        existing_aliases = models.EntityAlias.objects.filter(entity=entity, name=alias).exists()
         if not existing_aliases:
             alias_instance = models.EntityAlias(entity=entity, name=alias, preferred_indicator=preferred, created_by=creator)
             alias_instance.save()
@@ -32,14 +32,14 @@ def create_entity(name, entity_type, creator, **kwargs):
 
 
 def create_identity(entity, name, identity_type, creator, **kwargs):
-    existing_identity = models.Identity.objects.filter(name=name, identifier=name, identity_type=identity_type).all()
+    existing_identity = models.Identity.objects.filter(name=name, identifier=name, identity_type=identity_type).first()
     if not existing_identity:
         identity = models.Identity(name=name, identifier=name, identity_type=identity_type, is_private=False, created_by=creator)
         identity.save()
     else:
-        identity = existing_identity[0]
+        identity = existing_identity
 
-    existing_entity_identity = models.EntityIdentity.objects.filter(entity=entity, identity=identity).all()
+    existing_entity_identity = models.EntityIdentity.objects.filter(entity=entity, identity=identity).first()
     if not existing_entity_identity:
         entity_identity = models.EntityIdentity(entity=entity, identity=identity, is_private=False, created_by=creator)
         entity_identity.save()
@@ -371,6 +371,7 @@ class Migration(migrations.Migration):
             if federation_acronym:
                 aliases.append(federation_acronym)
 
+            print(federation_name)
             federation_entity = create_entity(federation_name, organization_entity_type, superuser_identity, website=federation_website, aliases=aliases)
 
             raw_founded_date = row['founded']

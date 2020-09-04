@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Algorithm(models.Model):
     type = models.ForeignKey('AlgorithmType', models.DO_NOTHING)

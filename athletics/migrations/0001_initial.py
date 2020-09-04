@@ -577,6 +577,9 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('last_modified_at', models.DateTimeField(blank=True, null=True)),
             ],
+            options={
+                'db_table': 'outcome_type',
+            },
         ),
         migrations.CreateModel(
             name='RaceOutcome',

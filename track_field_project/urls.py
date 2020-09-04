@@ -22,6 +22,7 @@ from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
     path(r'', views.IndexView.as_view(), name='home'),
+    path('about/', views.AboutView.as_view(), name='about'),
     path('pages/', include('django.contrib.flatpages.urls')),
     path('account/', include('identity.urls')),
     path('js-settings.js', views.js_settings, name='js_settings'),

@@ -1,16 +1,15 @@
 from django.urls import path
 
 urlpatterns = [
-    path('discipline', ''),
-    path('discipline/<slug:discipline>', ''),
-    path('discipline/<slug:discipline>/event', ''),
-    path('discipline/<slug:discipline>/event/<slug:event>', ''),
+    path('sport/<slug:sport>/discipline', ''),
+    path('sport/<slug:sport>/discipline/<slug:discipline>', ''),
+    path('sport/<slug:sport>/discipline/<slug:discipline>/event', ''),
+    path('sport/<slug:sport>/discipline/<slug:discipline>/event/<slug:event>', ''),
 
-    path('meet', ''),
-    path('meet/<slug:meet>', ''),
-    path('meet/<slug:meet>/instance/<slug:instance>', ''),
-    path('meet/<slug:meet>/instance/<slug:instance>/analysis', ''),
-    path('meet/<slug:meet>/instance/<slug:instance>/competition/<slug:competition>', ''),
+    path('sporting-event', ''),
+    path('sporting-event/<slug:sporting-event>', ''),
+    path('sporting-event/<slug:sporting-event>/<slug:competition>', ''),
+    path('sporting-event/<slug:sporting-event>/<slug:competition>/analysis', ''),
 
     path('entity', ''),
     path('entity/<slug:slug>', ''),
@@ -20,6 +19,6 @@ urlpatterns = [
 
     path('venue', ''),
     path('venue/<slug:slug>', ''),
-    path('venue/<slug:slug>/analysis', '')
+    path('venue/<slug:slug>/analysis', ''),
     path('venue/<slug:slug>/course/<slug:course>/analysis', '')
 ]

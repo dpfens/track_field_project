@@ -1,5 +1,7 @@
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.urls import reverse
+
 
 # Create your models here.
 class Address(models.Model):
@@ -242,6 +244,9 @@ class Venue(models.Model):
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+
+    def get_absolute_url(self):
+        return reverse('geography.views.venue_details', args=[str(self.slug)])
 
     def save(self, *args, **kwargs):
         if not self.slug:

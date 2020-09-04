@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
+from django.template.defaultfilters import slugify
 
 
 User = get_user_model()
@@ -21,6 +23,7 @@ class Attribute(models.Model):
 class Entity(models.Model):
     entity_type = models.ForeignKey('EntityType', models.DO_NOTHING)
     name = models.CharField(max_length=150)
+    slug = models.SlugField(max_length=150)
     knowledge_graph = models.ForeignKey('utility.KnowledgeGraph', models.DO_NOTHING, blank=True, null=True)
     website = models.CharField(max_length=100, blank=True, null=True)
     url = models.CharField(max_length=500, blank=True, null=True)
@@ -31,6 +34,18 @@ class Entity(models.Model):
 
     class Meta:
         db_table = 'entity'
+        unique_together = (('entity_type', 'slug'), )
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            raw_slug = slugify(self.name)
+            count = 1
+            slug = raw_slug
+            while Entity.objects.filter(slug=slug).exists():
+                slug = '%s-%s' % (raw_slug, count)
+                count = count + 1
+            self.slug = slug
+        super(Entity, self).save(*args, **kwargs)
 
 
 class EntityAlias(models.Model):
@@ -156,6 +171,9 @@ class Identity(models.Model):
     created_by = models.ForeignKey('self', models.DO_NOTHING, db_column='created_by', blank=True, null=True, related_name='created_identities')
     last_modified_at = models.DateTimeField(blank=True, null=True)
     last_modified_by = models.ForeignKey('self', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_identities')
+
+    def get_absolute_url(self):
+        return reverse('identity.views.identity_details', args=[self.slug])
 
     class Meta:
         db_table = 'identity'

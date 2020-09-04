@@ -20,6 +20,12 @@ class IndexView(View):
         return render(request, 'index.html', dict())
 
 
+class AboutView(View):
+
+    def get(self, request):
+        return render(request, 'about.html', dict())
+
+
 # Create your views here.
 @cache_page(60 * 15)
 def js_settings(request):
