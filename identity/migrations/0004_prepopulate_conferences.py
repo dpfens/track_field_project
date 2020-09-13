@@ -371,7 +371,6 @@ class Migration(migrations.Migration):
             if federation_acronym:
                 aliases.append(federation_acronym)
 
-            print(federation_name)
             federation_entity = create_entity(federation_name, organization_entity_type, superuser_identity, website=federation_website, aliases=aliases)
 
             raw_founded_date = row['founded']
