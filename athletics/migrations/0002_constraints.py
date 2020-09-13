@@ -148,11 +148,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='sportingevent',
-            name='timing_system',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='athletics.TimingSystem'),
-        ),
-        migrations.AddField(
-            model_name='sportingevent',
             name='venue',
             field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='geography.Venue'),
         ),
@@ -1000,6 +995,11 @@ class Migration(migrations.Migration):
             model_name='competitionrace',
             name='competition',
             field=models.OneToOneField(on_delete=django.db.models.deletion.DO_NOTHING, to='athletics.Competition'),
+        ),
+        migrations.AddField(
+            model_name='competitionrace',
+            name='timing_system',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='athletics.TimingSystem'),
         ),
         migrations.AddField(
             model_name='competitionrace',

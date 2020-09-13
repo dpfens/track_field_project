@@ -242,6 +242,7 @@ class CompetitionEvent(models.Model):
 
 class CompetitionRace(models.Model):
     competition = models.OneToOneField(Competition, on_delete=models.DO_NOTHING)
+    timing_system = models.ForeignKey('TimingSystem', models.DO_NOTHING, blank=True, null=True)
     start_interval = models.PositiveIntegerField()
     distance = models.FloatField()
     mode = models.ForeignKey('Mode', models.DO_NOTHING)
@@ -527,7 +528,6 @@ class Legitimacies(models.Model):
 
 class SportingEvent(models.Model):
     sporting_event_type = models.ForeignKey('SportingEventType', models.DO_NOTHING)
-    timing_system = models.ForeignKey('TimingSystem', models.DO_NOTHING, blank=True, null=True)
     environment = models.ForeignKey(Environment, models.DO_NOTHING)
     organization = models.ForeignKey('identity.Identity', models.DO_NOTHING, blank=True, null=True)
     division = models.ForeignKey(Division, models.DO_NOTHING, blank=True, null=True)
