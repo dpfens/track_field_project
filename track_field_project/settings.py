@@ -79,6 +79,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'utility.contextprocessors.privacy.dnt',
+                'utility.contextprocessors.general.device_info',
                 'utility.contextprocessors.general.general_info',
                 'utility.contextprocessors.impersonate.impersonation'
             ],
