@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Open+Sans:ital,wght@0,400;0,700;1,400&display=swap');
+
+$font-size: 16px;
+$header-fonts: 'Bree Serif', serif;
+$body-fonts: 'Open Sans', sans-serif;
+
+body {
+    display: flex;
+    flex-wrap: nowrap;
+    font-size: $font-size;
+    font-family: $body-fonts;
+    margin: 0;
+    line-height: 1.4;
+}
+
+header {
+    background: #DDD;
+    display: flex;
+    justify-content: space-between;
+
+    nav a {
+        padding: 0.25em 0.5em;
+        text-decoration: none;
+    }
+}
+
+div.body-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 5;
+}
+
+main {
+    flex-grow: 2;
+}
+
+@media (orientation: landscape) {
+  body {
+    flex-direction: row;
+    height: 100vh;
+  }
+
+  header {
+      flex-grow: 1;
+      flex-direction: column;
+
+      nav a {
+          display: block;
+      }
+  }
+
+  div.body-container {
+      overflow-y: auto;
+  }
+}
+
+
+@media (orientation: portrait) {
+  body {
+    flex-direction: column;
+  }
+
+  header {
+      flex-direction: row;
+
+      nav a {
+          display: inline-block;
+      }
+  }
+
+}
+
+
+footer {
+    text-align: center;
+}
+
+b, strong,  {
+    font-weight: 700;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $header-fonts;
+}
