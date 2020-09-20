@@ -3,6 +3,8 @@
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/dist/base.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'stylesheet/dist/components.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'stylesheet/dist/input.css' %}">
 {% endblock %}
 
 
@@ -24,6 +26,33 @@
           <a href="{% url 'admin:login' %}">Sign in</a>
           <a href="/register">Register</a>
         {% endif %}
+        <div class="dropdown responsive landscape-up is-hover">
+          <div class="dropdown-trigger">
+            <a class="button" aria-haspopup="true" aria-controls="dropdown-menu2">
+              <span>Content</span>
+              <span class="icon is-small">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </a>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu2" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>You can insert <strong>any type of content</strong> within the dropdown menu.</p>
+              </div>
+              <hr class="dropdown-divider">
+              <div class="dropdown-item">
+                <p>You simply need to use a <code>&lt;div&gt;</code> instead.</p>
+              </div>
+              <hr class="dropdown-divider">
+              <a href="#" class="dropdown-item">
+                This is a link
+              </a>
+            </div>
+          </div>
+        </div>
+
+
     </nav>
 </header>
 

@@ -1,0 +1,80 @@
+input {
+    font-size: 1em;
+
+}
+
+select {
+    font-size: 1em;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: .25em 0.5em;
+
+    &:focus {
+        border: 1px solid #DDD;
+    }
+
+    option {
+        padding: .25em 0.5em;
+
+        &:checked {
+            background: #DDD;
+        }
+
+        &:active {
+            background: green;
+        }
+    }
+
+    &[multiple] {
+        background: #eee;
+        -moz-appearance: none;
+    	-webkit-appearance: none;
+    	appearance: none;
+
+        &:disabled {
+            color: grey;
+        }
+    }
+
+    &:not([multiple]) {
+        background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #eee;
+        -moz-appearance: none;
+    	-webkit-appearance: none;
+    	appearance: none;
+        padding: .25em 0.5em;
+        background-position-x: 95%;
+        width: 10em;
+
+        &:disabled {
+            color: grey;
+        }
+    }
+}
+
+select
+
+select
+
+textarea {
+
+}
+
+
+button {
+    border: none;
+    border-radius: 0.25em;
+    font-size: 1em;
+    outline: none;
+    padding: 1em 2em;
+}
+
+
+.drag-drop {
+    border: 2px dashed #DDD;
+    min-height: 200px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

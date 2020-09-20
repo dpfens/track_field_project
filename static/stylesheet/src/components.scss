@@ -1,0 +1,285 @@
+/* Tab */
+.tabs {
+    display: flex;
+
+    @media only screen and (orientation: landscape) {
+            flex-direction: row;
+    }
+
+    @media only screen and (orientation: portrait) {
+            flex-direction: column;
+    }
+
+    &.no-js &-panel :target {
+        display: block;
+    }
+
+    &-links {
+        display: flex;
+        justify-content: center;
+
+        @media only screen and (orientation: landscape) {
+                flex-direction: column;
+                border-right: 1px solid #DDD;
+        }
+
+
+        @media only screen and (orientation: portrait) {
+                flex-direction: row;
+                border-bottom: 1px solid #DDD;
+        }
+
+        & .is-active {
+
+        }
+
+        & > * {
+            color: currentcolor;
+            cursor: pointer;
+            border-left: 1px solid #DDD;
+            border-right: 1px solid #DDD;
+            padding: 0.5em 1em;
+            text-decoration: none;
+
+            &:hover {
+                background: #EEE;
+            }
+
+            @media only screen and (orientation: landscape) {
+                    display: block;
+            }
+        }
+
+
+    }
+
+    &-panel {
+        margin: 0.5em;
+
+        & > * {
+            display: none;
+        }
+    }
+
+}
+
+
+.tabs.portrait {
+    flex-direction: column;
+
+    .links {
+        flex-direction: row;
+    }
+}
+
+
+.tabs.landscape {
+    flex-direction: row;
+
+    .links {
+        flex-direction: column;
+
+        & > * {
+            display: block;
+        }
+    }
+}
+
+
+/* Panel */
+
+
+/* Card */
+.card {
+
+}
+
+/* Menu */
+ul.menu-list {
+  list-style-type: none;
+  padding: 0;
+
+  li {
+    padding: 0.25em 0;
+
+    ul {
+      border-left: 1px solid #999;
+      list-style-type: none;
+      padding: 0 0 0 .75em;
+    }
+
+  }
+}
+
+/* Chip */
+.chip {
+  border-radius: 2em;
+  background: #EEE;
+  padding: 0.5em 0.5em 0.5em 0.75em;
+
+  img.avatar {
+    border-radius: 50%;
+    height: 1em;
+    width: 1em;
+  }
+
+  button {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 50%;
+    padding: 0.25em 0.5em;
+  }
+}
+
+/* Notification */
+
+/* Modal */
+
+/* Breadcrumb */
+ol.breadcrumb {
+    padding: 0;
+    list-style-type: none;
+
+    li {
+        display: inline-block;
+    }
+
+    li:not(:first-child)::before {
+        content: '/';
+        padding: 0 0.5em;
+    }
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0.5rem;
+
+  thead, tfoot {
+    vertical-align: middle;
+  }
+
+  th, td {
+    padding: 0.5em;
+  }
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+
+    &:not(.is-active) &-menu, &.is-hover &-menu {
+        display: none;
+    }
+
+    &-menu {
+        border: 1px solid #EEE;
+        background: #fff;
+        font-size: 0.8em;
+        position: absolute;
+        left: 0;
+        right: 0;
+        z-index: 1;
+    }
+
+    &.is-active &-menu, &.is-hover:hover &-menu {
+        display: block;
+    }
+
+
+    /* Open dropdown upwards  */
+    &.up &-menu, &.up.is-hover &-menu {
+        top: auto;
+    }
+
+    /* shift dropdown above toggle, when not horizontal to toggle */
+    &.up:not(.horizontal) &-menu, &.up.is-hover &-menu {
+        top: auto;
+        bottom: 100%;
+    }
+
+    /* open dropdown to the right to the toggle */
+    &.horizontal &-menu, &.horizontal.is-hover &-menu {
+        transform: translateX(100%);
+        bottom: 0;
+    }
+
+    /* Align content of dropdown */
+    &.left-align &-menu {
+        left: 0;
+        right: auto;
+    }
+
+    &.right-align &-menu {
+        left: auto;
+        right: 0;
+    }
+
+    /* responsive */
+    &.responsive &-menu  {
+        @media (orientation: landscape) {
+            transform: translateX(100%);
+            top: 0;
+        }
+    }
+
+    &.responsive.landscape-up &-menu {
+        @media (orientation: landscape) {
+            transform: translateX(100%);
+            bottom: 0;
+            top: auto;
+        }
+    }
+
+    &.responsive.portrait-up &-menu {
+        @media (orientation: portrait) {
+            bottom: 100%;
+        }
+    }
+
+    /* styling of dropdown items */
+    &-content {
+        padding: 0;
+    }
+
+    &-divider, &-content &-item * {
+        margin: 0;
+    }
+
+    &-content &-item {
+        display: block;
+        margin: 0;
+        padding: 0.5em 0.25em;
+        text-decoration: none;
+
+        &:hover {
+            background: #DDD;
+        }
+    }
+
+    &-content > a {
+        cursor: pointer;
+    }
+}
+
+/* simple tooltip */
+[aria-label].tooltip {
+    position: relative;
+
+    &:hover::before {
+        position: absolute;
+        content: attr(aria-label);
+
+        background: #222;
+        bottom: 122%;
+        color:  #FFF;
+        padding: .5em 0.25em;
+        min-width: 10em;
+    }
+
+    &.tooltip-below::before {
+        bottom: auto;
+        top: 122%;
+    }
+}

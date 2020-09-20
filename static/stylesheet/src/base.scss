@@ -11,16 +11,14 @@ body {
     font-family: $body-fonts;
     margin: 0;
     line-height: 1.4;
-}
 
-header {
-    background: #DDD;
-    display: flex;
-    justify-content: space-between;
+    @media (orientation: landscape) {
+        flex-direction: row;
+        height: 100vh;
+    }
 
-    nav a {
-        padding: 0.25em 0.5em;
-        text-decoration: none;
+    @media (orientation: portrait) {
+        flex-direction: column;
     }
 }
 
@@ -28,58 +26,56 @@ div.body-container {
     display: flex;
     flex-direction: column;
     flex-grow: 5;
+
+    @media (orientation: landscape) {
+        overflow-y: auto;
+    }
 }
 
 main {
     flex-grow: 2;
 }
 
-@media (orientation: landscape) {
-  body {
-    flex-direction: row;
-    height: 100vh;
-  }
 
-  header {
-      flex-grow: 1;
-      flex-direction: column;
+/* Nav Menu */
+header {
+    background: #DDD;
+    display: flex;
+    justify-content: space-between;
 
-      nav a {
-          display: block;
-      }
-  }
+    @media (orientation: landscape) {
+        flex-grow: 1;
+        flex-direction: column;
 
-  div.body-container {
-      overflow-y: auto;
-  }
+        nav a {
+            display: block;
+        }
+    }
+
+    @media (orientation: portrait) {
+        flex-direction: row;
+
+        nav a {
+            display: inline-block;
+        }
+    }
+
+    nav a {
+        padding: 0.25em 0.5em;
+        text-decoration: none;
+    }
 }
-
-
-@media (orientation: portrait) {
-  body {
-    flex-direction: column;
-  }
-
-  header {
-      flex-direction: row;
-
-      nav a {
-          display: inline-block;
-      }
-  }
-
-}
-
 
 footer {
     text-align: center;
 }
 
-b, strong,  {
+b, strong {
     font-weight: 700;
 }
 
 
 h1, h2, h3, h4, h5, h6 {
     font-family: $header-fonts;
+    font-weight: 400;
 }
