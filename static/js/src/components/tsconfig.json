@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES5", "DOM"],
+    "outFile": "../../dist/lib/components.js",
+  },
+  "include": ["*.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
