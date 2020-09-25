@@ -1,9 +1,3 @@
-interface FLIPConfig {
-    activeClass: string;
-    inactiveClass: string | null;
-    transitionClass: string;
-}
-
 class CSSTransitionFLIP {
     private element: HTMLElement;
     private activeClass: string | null;

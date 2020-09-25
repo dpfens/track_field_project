@@ -2,7 +2,9 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["ES5", "DOM"],
-    "outFile": "../../dist/lib/components.js",
+    "outFile": "../../dist/libs/components.js",
+    "declaration": true,
+    "declarationMap": true
   },
   "include": ["*.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]

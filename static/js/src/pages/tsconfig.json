@@ -1,9 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "lib": ["ES5", "DOM"],
-    "outDir": "../../dist/pages/",
+      "lib": ["ES5", "DOM"],
+      "outDir": "../../dist/pages/",
   },
-  "include": ["*.ts"],
+  "include": ["*.ts", "*/*.ts", "../../dist/libs/*.d.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

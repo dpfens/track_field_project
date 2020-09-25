@@ -1,5 +1,5 @@
 interface DragAndDropConfig {
-    fileElement: HTMLElement;
+    fileElement: HTMLElement | null;
     validationFunc: any;
 }
 
@@ -9,10 +9,13 @@ class DragAndDrop {
     protected inputElement: HTMLInputElement;
     protected config: DragAndDropConfig;
 
-    constructor(element: HTMLElement, inputElement: HTMLInputElement, config: DragAndDropConfig) {
+    constructor(element: HTMLElement, inputElement: HTMLInputElement, config?: DragAndDropConfig) {
         this.element = element;
         this.inputElement = inputElement;
-        this.config = config;
+        this.config = config || {
+          fileElement: null,
+          validationFunc: null
+        };
 
         this.clickHandler = this.clickHandler.bind(this);
         this.dragEnterHandler = this.dragEnterHandler.bind(this);
@@ -56,7 +59,7 @@ class DragAndDrop {
 
     dropHandler(event: DragEvent) {
         if (event.dataTransfer) {
-            var files: FileList = event.dataTransfer.files
+            var files: FileList = event.dataTransfer.files;
             if (this.config.validationFunc && !this.config.validationFunc(files)) {
                 return;
             }

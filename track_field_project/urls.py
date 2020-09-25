@@ -25,6 +25,7 @@ urlpatterns = [
     path('about/', views.AboutView.as_view(), name='about'),
     path('pages/', include('django.contrib.flatpages.urls')),
     path('account/', include('identity.urls')),
+    path('utility/', include('utility.urls')),
     path('js-settings.js', views.js_settings, name='js_settings'),
     path('admin/', admin.site.urls),
     path('advanced-admin/', advanced_admin.urls),
