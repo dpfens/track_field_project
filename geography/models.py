@@ -1,10 +1,14 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+from utility.models import base as base_models
 
 
 # Create your models here.
-class Address(models.Model):
+class Address(base_models.BaseAuditModel):
+    """
+    Information about a given postal address
+    """
     raw = models.CharField(max_length=1000)
     name = models.CharField(max_length=150)
     company_name = models.CharField(max_length=150)
@@ -15,67 +19,47 @@ class Address(models.Model):
     state = models.CharField(max_length=50)
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=3)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_addresses')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_addresses')
-
-    class Meta:
-        db_table = 'address'
 
 
-class AddressComponent(models.Model):
+class AddressComponent(base_models.BaseModel):
+    """
+    A specific address component instance
+
+    Example: Des Moines, Sacramento County, Colorado Avenue
+    """
     address_component_type = models.ForeignKey('AddressComponentType', models.DO_NOTHING)
     name = models.CharField(max_length=150)
     long_name = models.CharField(max_length=150)
     short_name = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_address_components')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_address_components')
-
-    class Meta:
-        db_table = 'address_component'
 
 
-class AddressComponentType(models.Model):
+class AddressComponentType(base_models.BaseModel):
+    """
+    Type of address component
+
+    Examples: Locality, political, neighborhood, establishment, etc.
+    """
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_address_component_types')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_address_component_types')
-
-    class Meta:
-        db_table = 'address_component_type'
 
 
-class Amenity(models.Model):
+class Amenity(base_models.BaseAuditModel):
+    """
+    Features of a given Venue
+
+    Example: Weight room, Pool, etc.
+    """
     name = models.CharField(unique=True, max_length=25)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_amenities')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_amenities')
-
-    class Meta:
-        db_table = 'amenity'
 
 
-class Continent(models.Model):
+class Continent(base_models.BaseModel):
     code = models.CharField(unique=True, max_length=2)
     name = models.CharField(unique=True, max_length=13)
     geonames_id = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_continents')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_continents')
-
-    class Meta:
-        db_table = 'continent'
 
 
-class Country(models.Model):
+class Country(base_models.BaseModel):
     continent = models.ForeignKey(Continent, models.DO_NOTHING)
     iso = models.CharField(unique=True, max_length=2, blank=True, null=True)
     iso3 = models.CharField(max_length=3, blank=True, null=True)
@@ -99,11 +83,11 @@ class Country(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
 
-    class Meta:
-        db_table = 'country'
 
-
-class CountryCodes(models.Model):
+class CountryCodes(base_models.BaseModel):
+    """
+    Country ID codes
+    """
     country = models.OneToOneField(Country, on_delete=models.DO_NOTHING)
     ioc_code = models.CharField(max_length=3, blank=True, null=True)
     fifa_code = models.CharField(max_length=3, blank=True, null=True)
@@ -112,64 +96,44 @@ class CountryCodes(models.Model):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
 
-    class Meta:
-        db_table = 'country_codes'
 
-
-class CountryCurrency(models.Model):
+class CountryCurrency(base_models.BaseModel):
     country = models.ForeignKey(Country, models.DO_NOTHING)
     currency = models.ForeignKey('Currency', models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_country_currencies')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_country_currencies')
 
     class Meta:
-        db_table = 'country_currency'
         unique_together = (('country', 'currency'),)
 
 
-class Currency(models.Model):
+class Currency(base_models.BaseModel):
     code = models.CharField(max_length=10)
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_currencies')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_currencies')
-
-    class Meta:
-        db_table = 'currency'
 
 
-class Language(models.Model):
+class Language(base_models.BaseModel):
+    """
+    Identifiers of languages
+    """
     iso_639_3 = models.CharField(max_length=3, blank=True, null=True)
     iso_639_2 = models.CharField(max_length=11, blank=True, null=True)
     iso_639_1 = models.CharField(max_length=2, blank=True, null=True)
     name = models.CharField(max_length=58, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_languages')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_languages')
-
-    class Meta:
-        db_table = 'language'
 
 
-class LanguageVariant(models.Model):
+class LanguageVariant(base_models.BaseModel):
+    """
+    Language variants
+    """
     language = models.ForeignKey(Language, models.DO_NOTHING)
     iso_639_1 = models.CharField(max_length=14, blank=True, null=True)
     language_code = models.CharField(max_length=4, blank=True, null=True)
     territory = models.CharField(max_length=3, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_language_variants')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_language_variants')
-
-    class Meta:
-        db_table = 'language_variant'
 
 
-class Location(models.Model):
+class Location(base_models.BaseModel):
+    """
+    A location based on geographic coordinates and elevation
+    """
     id = models.BigAutoField(primary_key=True)
     place_id = models.CharField(max_length=300)
     geonames_id = models.PositiveIntegerField(blank=True, null=True)
@@ -177,73 +141,50 @@ class Location(models.Model):
     latitude = models.DecimalField(max_digits=12, decimal_places=3)
     longitude = models.DecimalField(max_digits=12, decimal_places=3)
     elevation = models.DecimalField(max_digits=12, decimal_places=5, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_locations')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_locations')
-
-    class Meta:
-        db_table = 'location'
 
 
-class LocationAddress(models.Model):
+class LocationAddress(base_models.BaseModel):
+    """
+    Linking a location to an address
+    """
     location = models.ForeignKey(Location, models.DO_NOTHING)
     address_component = models.ForeignKey(AddressComponent, models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_addresses')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_addresses')
 
     class Meta:
-        db_table = 'location_address'
         unique_together = (('address_component', 'location'),)
 
 
-class LocationType(models.Model):
+class LocationType(base_models.BaseModel):
+    """
+    """
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_type')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_type')
-
-    class Meta:
-        db_table = 'location_type'
 
 
-class LocationTypes(models.Model):
+class LocationTypes(base_models.BaseModel):
     location_type = models.ForeignKey(LocationType, models.DO_NOTHING)
     location = models.ForeignKey(Location, models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='created_location_types')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', blank=True, null=True, related_name='last_modified_location_types')
 
     class Meta:
-        db_table = 'location_types'
         unique_together = (('location_type', 'location'),)
 
 
-class Terrain(models.Model):
+class Terrain(base_models.BaseModel):
+    """
+    Types of Terrain
+
+    Example: Hills, Mountains, Plains, etc.
+    """
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=20)
-
-    class Meta:
-        db_table = 'terrain'
 
 
-class Venue(models.Model):
+class Venue(base_models.BaseModel):
+    """
+    """
     name = models.CharField(max_length=100, blank=True, null=True)
     slug = models.CharField(unique=True, max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
+    address = models.ForeignKey(Address, models.DO_NOTHING)
 
     def get_absolute_url(self):
         return reverse('geography.views.venue_details', args=[str(self.slug)])
@@ -253,78 +194,63 @@ class Venue(models.Model):
             self.slug = slugify(self.name)
         super(Venue, self).save(*args, **kwargs)
 
-    class Meta:
-        db_table = 'venue'
 
-
-class VenueAmenities(models.Model):
+class VenueAmenities(base_models.BaseModel):
+    """
+    Records when amenities were added/removes from a venue
+    """
     venue = models.OneToOneField(Venue, on_delete=models.DO_NOTHING)
     amenity = models.ForeignKey(Amenity, models.DO_NOTHING)
     start = models.DateField()
     end = models.DateField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by')
 
     class Meta:
-        db_table = 'venue_amenities'
         unique_together = (('venue', 'amenity'),)
 
 
-class VenueLocations(models.Model):
+class VenueLocations(base_models.BaseModel):
+    """
+    Identifies the location of a venue
+    """
     venue = models.ForeignKey(Venue, models.DO_NOTHING)
     location = models.ForeignKey(Location, models.DO_NOTHING)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        db_table = 'venue_locations'
         unique_together = (('venue', 'location'),)
 
 
-class VenueType(models.Model):
+class VenueType(base_models.BaseModel):
+    """
+    Type of venue
+
+    Example: embassy, clothing store, museum, etc.
+    """
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
-    source = models.CharField(max_length=25)
-
-    class Meta:
-        db_table = 'venue_type'
 
 
-class VenueTypes(models.Model):
+class VenueTypes(base_models.BaseModel):
+    """
+    Assocates a Venue Type to a Venue
+    """
     venue = models.ForeignKey(Venue, models.DO_NOTHING)
     venue_type = models.ForeignKey(VenueType, models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        db_table = 'venue_types'
         unique_together = (('venue_type', 'venue'),)
 
 
-class Weather(models.Model):
+class Weather(base_models.BaseAuditModel):
+    """
+    Weather at a given location at a given time
+    """
     location = models.ForeignKey(Location, models.DO_NOTHING)
     date = models.DateTimeField()
     temperature = models.DecimalField(max_digits=5, decimal_places=2)
     precipitation = models.DecimalField(max_digits=5, decimal_places=2)
     humidity = models.DecimalField(max_digits=5, decimal_places=2)
-    source = models.CharField(max_length=25)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by')
-    last_modified_at = models.DateTimeField(blank=True, null=True)
-    last_modified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='last_modified_by', related_name='%(class)s_last_modified_by', blank=True, null=True)
 
     class Meta:
-        db_table = 'weather'
-        unique_together = (('location', 'date', 'source'),)
+        unique_together = (('location', 'date', ),)

@@ -14,14 +14,12 @@ class Migration(migrations.Migration):
     ]
 
     def create_entity_types(apps, schema_editor):
-        superuser = User.objects.filter(is_superuser=True).first()
-        identity = models.Identity.objects.get(user_id=superuser.id)
         types = ['Person', 'Organization', 'Government', 'Bot', 'Relay']
         for type in types:
             try:
                 models.EntityType.objects.get(name=type)
             except Exception:
-                entity_type = models.EntityType(name=type, description='', created_by=identity)
+                entity_type = models.EntityType(name=type, description='')
                 entity_type.save()
 
     def create_identity_types(apps, schema_editor):
@@ -30,19 +28,16 @@ class Migration(migrations.Migration):
             try:
                 models.IdentityType.objects.get(name=type)
             except Exception:
-                identity_type = models.IdentityType(name=type, description='', created_by=None)
+                identity_type = models.IdentityType(name=type, description='')
                 identity_type.save()
 
     def create_organization_types(apps, schema_editor):
-        superuser = User.objects.filter(is_superuser=True).first()
-        identity = models.Identity.objects.get(user_id=superuser.id)
-
         types = ['Business', 'Federation', 'Government', 'Association', 'Committee', 'Conference', 'University',  'Club']
         for type in types:
             try:
                 models.OrganizationType.objects.get(name=type)
             except Exception:
-                organization_type = models.OrganizationType(name=type, description='', created_by=identity)
+                organization_type = models.OrganizationType(name=type, description='')
                 organization_type.save()
 
     def create_organization(apps, schema_editor):
@@ -78,13 +73,11 @@ class Migration(migrations.Migration):
             entity_identity.save()
 
     def create_genders(apps, schema_editor):
-        superuser = User.objects.filter(is_superuser=True).first()
-        superuser_identity = models.Identity.objects.get(user_id=superuser.id)
         genders = ('Male', 'Female')
         for gender_name in genders:
             gender = models.Gender.objects.filter(name=gender_name).first()
             if not gender:
-                gender = models.Gender(name=gender_name, description='', created_by=superuser_identity)
+                gender = models.Gender(name=gender_name, description='')
                 gender.save()
 
     def create_superuser(apps, schema_editor):
@@ -97,7 +90,6 @@ class Migration(migrations.Migration):
             password = input('Password for superuser %r:' % user_name)
             superuser = User.objects.create_superuser(user_name, email, password)
             superuser.save()
-
 
         identity_type = models.IdentityType.objects.get(name='User')
         try:

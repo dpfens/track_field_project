@@ -14,10 +14,6 @@ class Migration(migrations.Migration):
     ]
 
     def add_continents(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
-        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
-
         codes = ['AF', 'AN', 'AS', 'EU', 'NA', 'OC', 'SA']
         continent_names = ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']
         geonames_ids = [6255146, 6255152, 6255147, 6255148, 6255149, 6255151, 255150]
@@ -26,7 +22,7 @@ class Migration(migrations.Migration):
             try:
                 geography.models.Continent.objects.get(code=code)
             except Exception:
-                instance = geography.models.Continent(code=code, name=name, geonames_id=geonames_id, created_by=superuser_identity)
+                instance = geography.models.Continent(code=code, name=name, geonames_id=geonames_id)
                 instance.save()
 
 
@@ -285,9 +281,6 @@ class Migration(migrations.Migration):
             {"postal_code_format": "#####", "equivalent_fips_code": "", "geonames_id": "8505033", "full_name": "Serbia and Montenegro", "currency_code": "RSD", "tld": ".cs", "neighbours": "AL,HU,MK,RO,HR,BA,BG", "languages": "cu,hu,sq,sr", "phone": "381", "iso3": "SCG", "fips": "YI", "capital": "Belgrade", "postal_code_regex": "^(\\d{5})$", "iso": "CS", "iso_numeric": "891", "area": "102350", "currency_name": "Dinar", "continent": "EU", "population": "10829175"},
             {"postal_code_format": "", "equivalent_fips_code": "", "geonames_id": "8505032", "full_name": "Netherlands Antilles", "currency_code": "ANG", "tld": ".an", "neighbours": "GP", "languages": "nl-AN,en,es", "phone": "599", "iso3": "ANT", "fips": "NT", "capital": "Willemstad", "postal_code_regex": "", "iso": "AN", "iso_numeric": "530", "area": "960", "currency_name": "Guilder", "continent": "NA", "population": "300000"},
         ]
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
-        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
         for row in data:
             try:
                 country = geography.models.Country.objects.get(iso=row['iso'])
@@ -306,44 +299,35 @@ class Migration(migrations.Migration):
             try:
                 currency = geography.models.Currency.objects.get(code=currency_code)
             except Exception:
-                currency = geography.models.Currency(code=currency_code, name=currency_name, created_by=superuser_identity)
+                currency = geography.models.Currency(code=currency_code, name=currency_name)
                 currency.save()
 
             try:
                 country_currency = geography.models.CountryCurrency.objects.get(country=country, currency=currency)
             except Exception as e:
                 print(e)
-                country_currency = geography.models.CountryCurrency(country=country, currency=currency, created_by=superuser_identity)
+                country_currency = geography.models.CountryCurrency(country=country, currency=currency)
                 country_currency.save()
 
     def add_address_component_types(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
-        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
-
         address_component_types = ["locality", "political", "administrative_area_level_2", "administrative_area_level_1", "country", "street_number", "route", "postal_code", "administrative_area_level_3", "neighborhood", "establishment", "natural_feature", "colloquial_area", "subpremise", "postal_code_suffix", "sublocality", "sublocality_level_1", "archipelago", "park", "point_of_interest", "premise", "sublocality_level_4", "sublocality_level_2", "postal_code_prefix", "administrative_area_level_4", "bus_station", "transit_station", "museum", "stadium", "campground", "local_government_office", "lodging", "postal_town"]
 
         for name in address_component_types:
             try:
                 instance = geography.models.AddressComponentType.objects.get(name=name)
             except Exception:
-                instance = geography.models.AddressComponentType(name=name, description='', created_by=superuser_identity)
+                instance = geography.models.AddressComponentType(name=name, description='')
                 instance.save()
 
     def add_venue_types(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
-        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
-
         venue_types = ["locality","political","establishment","point_of_interest","university","neighborhood","natural_feature","food","restaurant","colloquial_area","administrative_area_level_3","store","car_repair","convenience_store","gas_station","country","lawyer","travel_agency","clothing_store","embassy","administrative_area_level_2","archipelago","park","church","museum","place_of_worship","administrative_area_level_1","bar","finance","school","beauty_salon","lodging","general_contractor","route","street_address","health","meal_takeaway","stadium","hospital","bank","premise","dentist","doctor","gym","local_government_office","book_store","library","bus_station","transit_station","department_store","electronics_store","furniture_store","grocery_or_supermarket","home_goods_store","cemetery","bakery","liquor_store","amusement_park","funeral_home","sublocality","sublocality_level_1","car_dealer","police","veterinary_care","bowling_alley","campground","hair_care","courthouse","cafe"]
 
         for name in venue_types:
             try:
                 instance = geography.models.VenueType.objects.get(name=name)
             except Exception:
-                instance = geography.models.VenueType(name=name, created_by=superuser_identity)
+                instance = geography.models.VenueType(name=name)
                 instance.save()
-
 
     operations = [
         migrations.RunPython(add_continents),

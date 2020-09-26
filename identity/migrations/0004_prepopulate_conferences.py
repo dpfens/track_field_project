@@ -5,7 +5,7 @@ from datetime import datetime
 from django.db import migrations
 from django.contrib.auth.models import User
 from identity import models
-from athletics import models as athletics_models
+from sport import models as athletics_models
 
 
 def create_entity(name, entity_type, creator, **kwargs):

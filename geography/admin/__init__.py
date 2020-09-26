@@ -2,7 +2,7 @@ from django.contrib import admin
 from track_field_project.admin.site import advanced_admin
 from geography import models
 
-READONLY_FIELDS = ('created_at', 'created_by', 'last_modified_at', 'last_modified_by')
+READONLY_FIELDS = ('created_at', 'last_modified_at')
 
 
 @admin.register(models.Address, site=advanced_admin)

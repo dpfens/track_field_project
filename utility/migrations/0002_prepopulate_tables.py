@@ -14,10 +14,6 @@ class Migration(migrations.Migration):
     ]
 
     def add_unit_systems(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
-        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
-
         systems = [{
         	"id": "1",
         	"name": "Imperial",
@@ -50,15 +46,11 @@ class Migration(migrations.Migration):
             try:
                 instance = utility.models.UnitSystem.objects.get(name=item['name'])
             except Exception:
-                instance = utility.models.UnitSystem(created_by=superuser_identity, **item)
+                instance = utility.models.UnitSystem(**item)
                 instance.save()
 
 
     def add_quantity(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
-        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
-
         data = [{
         	"id": "1",
         	"name": "Plane angle",
@@ -841,14 +833,10 @@ class Migration(migrations.Migration):
             try:
                 instance = utility.models.Quantity.objects.get(name=name)
             except Exception:
-                instance = utility.models.Quantity(**item, created_by=superuser_identity)
+                instance = utility.models.Quantity(**item)
                 instance.save()
 
     def add_units(apps, schema_editor):
-        superusers = User.objects.filter(is_superuser=True).all()
-        superuser = superusers[0]
-        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
-
         data = [{"id":"1","unit_system_id":"5","quantity_id":"90","name":"Meter","description":"","acronym":"m","abbreviation":"m","wikipedia_url":None},
         {"id":"2","unit_system_id":"5","quantity_id":"90","name":"Millimeter","description":"","acronym":"mm","abbreviation":"mm","wikipedia_url":None},
         {"id":"3","unit_system_id":"5","quantity_id":"90","name":"Centimeter","description":"","acronym":"cm","abbreviation":"cm","wikipedia_url":None},
@@ -955,10 +943,12 @@ class Migration(migrations.Migration):
             item['quantity'] = utility.models.Quantity.objects.get(id=quantity_id)
             unit_system_id = item.pop('unit_system_id')
             item['unit_system'] = utility.models.UnitSystem.objects.get(id=unit_system_id)
+
+            name = item['name']
             try:
                 instance = utility.models.Unit.objects.get(name=name)
             except Exception:
-                instance = utility.models.Unit(created_by=superuser_identity, **item)
+                instance = utility.models.Unit(**item)
                 instance.save()
 
 

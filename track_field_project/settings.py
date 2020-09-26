@@ -44,10 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_user_agents',
     'analytics',
-    'athletics',
     'identity',
     'geography',
-    'utility'
+    'sport',
+    'utility',
+    'webanalytics'
 ]
 
 MIDDLEWARE = [
@@ -69,7 +70,7 @@ ROOT_URLCONF = 'track_field_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'),],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -98,7 +99,7 @@ WSGI_APPLICATION = 'track_field_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'track_field_project',
+        'NAME': 'track_field_project_development',
         'USER': 'root',
         'PASSWORD': 'Speedy31790',
         'HOST': '127.0.0.1',
@@ -187,10 +188,10 @@ LOGGING = {
             "when": "midnight",
             "delay": True
         },
-        "athletics_handler": {
+        "sport_handler": {
             "level": "INFO",
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": "logs/athletics.log",
+            "filename": "logs/sport.log",
             "backupCount": 30,
             "when": "midnight",
             "delay": True
@@ -270,8 +271,8 @@ LOGGING = {
             "handlers": ["application_handler", "analytics_handler"],
             "level": "DEBUG"
         },
-        "athletics": {
-            "handlers": ["application_handler", "athletics_handler"],
+        "sport": {
+            "handlers": ["application_handler", "sport_handler"],
             "level": "DEBUG"
         },
         "geography": {
