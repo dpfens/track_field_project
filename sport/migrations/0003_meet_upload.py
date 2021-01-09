@@ -97,8 +97,6 @@ class Migration(migrations.Migration):
             sporting_event_type = models.SportingEventType(name='Road Race', description='', created_by=superuser_identity)
             sporting_event_type.save()
 
-        meet_name = u'Maratón de Valencia'
-
         venue_name = 'Valencia, City of Arts and Sciences'
         venue = geography_models.Venue.objects.filter(name=venue_name).first()
         if not venue:
@@ -106,22 +104,20 @@ class Migration(migrations.Migration):
             venue = geography_models.Venue(name=venue_name, slug=venue_slug, created_by=superuser_identity)
             venue.save()
 
-        sport = models.Sport.objects.get(name='Running')
-        field_of_play = models.FieldOfPlay.objects.filter(venue=venue, name=venue_name, sport=sport).first()
+        activity = models.Activity.objects.get(name='Running')
+        field_of_play = models.FieldOfPlay.objects.filter(venue=venue, name=venue_name).first()
         if not field_of_play:
             established = datetime(1981, 12, 5)
             retired = None
-            field_of_play = models.FieldOfPlay(venue=venue, name=venue_name, sport=sport, established=established, retired=retired, created_by=superuser_identity)
-            field_of_play.save()
+            field_of_play = models.FieldOfPlay.create(venue=venue, name=venue_name, established=established, retired=retired, created_by=superuser_identity)
 
-        meet_start_date = datetime(2014, 12, 1)
-        meet_end_date = datetime(2014, 12, 3)
-        meet_name = u'Maratón de Valencia'
-        meet_url = 'https://www.valenciaciudaddelrunning.com/en/marathon/previous-editions-marathon/ranking-marathon-2014/'
-        sporting_event = models.SportingEvent.objects.filter(venue=venue, name=meet_name, start_date=meet_start_date, end_date=meet_end_date, url=meet_url).first()
-        if not sporting_event:
-            sporting_event = models.SportingEvent(sporting_event_type=sporting_event_type, environment=outdoor_environment, venue=venue, name=meet_name, slug='2014-valencia-marathon', start_date=meet_start_date, end_date=meet_end_date, url=meet_url, championship=False, participants=0, created_by=superuser_identity)
-            sporting_event.save()
+        event_url = 'https://www.valenciaciudaddelrunning.com/en/marathon'
+        event = models.Event.create(environment=outdoor_environment, venue=venue, name=u'Maratón de Valencia', slug='valencia-marathon', url=event_url, created_by=superuser_identity)
+
+        event_start_date = datetime(2014, 12, 1)
+        event_end_date = datetime(2014, 12, 3)
+        event_url = 'https://www.valenciaciudaddelrunning.com/en/marathon/previous-editions-marathon/ranking-marathon-2014/'
+        event_instance = models.EventInstance.create(event=event, name=meet_name, slug='2014-valencia-marathon', start_date=event_start_date, end_date=event_end_date, url=event_url, participants=0, created_by=superuser_identity)
 
         scoring = models.Scoring.objects.get(name='Minimization')
 

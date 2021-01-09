@@ -180,15 +180,6 @@ class CompetitionType(base_models.BaseModel):
     description = models.CharField(max_length=255)
 
 
-class Discipline(base_models.BaseModel, models.Model):
-    sport = models.ForeignKey('Sport', models.DO_NOTHING)
-    name = models.CharField(unique=True, max_length=50)
-    description = models.CharField(max_length=255)
-
-    class Meta:
-        db_table = 'discipline'
-
-
 class Disqualification(base_models.BaseAuditModel):
     organization = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     code = models.CharField(max_length=15)
@@ -327,6 +318,11 @@ class Game(base_models.BaseAuditModel):
     scoring_quantity = models.ForeignKey('utility.Quantity', models.DO_NOTHING)
     economics = models.ForeignKey('GameEconomics', models.DO_NOTHING)
     is_team = models.BooleanField()
+    is_perfect_information = models.BooleanField()
+    is_symmetric = models.BooleanField()
+    is_cooperative = models.BooleanField()
+    is_simultaneous = models.BooleanField()
+    is_move_by_nature = models.BooleanField()
 
     class Meta:
         unique_together = (('activity', 'scoring_evaluation', 'scoring_mechanism', 'scoring_type', 'economics', 'scoring_quantity'), ('activity', 'name'))
@@ -557,26 +553,6 @@ class SponsorshipCompetition(base_models.BaseAuditModel):
     amount = models.FloatField()
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
-
-
-class Sport(base_models.BaseModel):
-    sport_type = models.ForeignKey('SportType', models.DO_NOTHING)
-    name = models.CharField(max_length=200)
-    description = models.TextField()
-    scoring_units = models.ForeignKey('utility.Unit', models.DO_NOTHING)
-    wikipedia = models.CharField(max_length=150)
-    knowledge_graph = models.OneToOneField('utility.KnowledgeGraph', on_delete=models.DO_NOTHING, unique=True, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class SportType(base_models.BaseModel):
-    name = models.CharField(unique=True, max_length=200)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.name
 
 
 class Strategy(base_models.BaseModel):
