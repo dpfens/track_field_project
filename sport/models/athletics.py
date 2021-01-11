@@ -54,10 +54,13 @@ class AttemptType(base_models.BaseModel):
 
 class CompetitionRace(base_models.BaseAuditModel):
     competition = models.OneToOneField('Competition', on_delete=models.DO_NOTHING)
+    course = models.OneToOneField('Course', on_delete=models.DO_NOTHING)
     timing_system = models.ForeignKey('TimingSystem', models.DO_NOTHING, blank=True, null=True)
     start_interval = models.PositiveIntegerField()
     distance = models.FloatField()
+    distance_unit = models.ForeignKey('utility.Unit', models.DO_NOTHING)
     mode = models.ForeignKey('Mode', models.DO_NOTHING)
+    is_stage = models.BooleanField(default=False)
 
 
 class CompetitionRaceHurdles(base_models.BaseAuditModel):
@@ -75,8 +78,11 @@ class CompetitionWeight(base_models.BaseAuditModel):
 class Course(base_models.BaseAuditModel):
     course_type = models.ForeignKey('CourseType', models.DO_NOTHING)
     field_of_play = models.ForeignKey('FieldOfPlay', models.DO_NOTHING)
-    surface = models.ForeignKey('Surface', models.DO_NOTHING)
+    surface = models.ForeignKey('Surface', models.DO_NOTHING, null=True, blank=True)
     distance = models.DecimalField(max_digits=12, decimal_places=3)
+    distance_unit = models.ForeignKey('utility.Unit', models.DO_NOTHING)
+    start_location = models.ForeignKey('geography.Location', models.DO_NOTHING, blank=True, null=True, related_name='course_starts')
+    finish_location = models.ForeignKey('geography.Location', models.DO_NOTHING, blank=True, null=True, related_name='course_finishes')
 
 
 class CourseAttribute(attribute_models.BaseAttributeModel):
@@ -137,18 +143,16 @@ class Heat(base_models.BaseAuditModel):
 
 
 class Mode(base_models.BaseModel):
+    """
+    Mode of transportation
+
+    Ex. Running, Swimming, Cycling, Walking, Wheelchair, Race Car, etc.
+    """
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
-
-
-class RaceCompetition(base_models.BaseAuditModel):
-    competition = models.OneToOneField('sport.Competition', models.DO_NOTHING, related_name='race')
-    distance = models.FloatField()
-    distance_unit = models.ForeignKey('utility.Unit', models.DO_NOTHING)
-    is_stage = models.BooleanField(default=False)
 
 
 class RaceOutcome(base_models.BaseAuditModel):
@@ -177,7 +181,8 @@ class RaceOutcomeState(base_models.BaseModel):
 
 class RelayOrder(base_models.BaseAuditModel):
     race_outcome = models.ForeignKey('RaceOutcome', models.CASCADE)
-    identity = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_orders')
+    relay = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_orders')
+    identity = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='relay_member_orders')
     sequence = models.PositiveSmallIntegerField()
     distance = models.PositiveIntegerField()
 
@@ -216,6 +221,8 @@ class SeedMethod(base_models.BaseModel):
 
 class Split(base_models.BaseAuditModel):
     race_outcome = models.OneToOneField(RaceOutcome, on_delete=models.DO_NOTHING)
+    competitor = models.ForeignKey('identity.Identity', models.DO_NOTHING)
+    mode = models.ForeignKey(Mode, models.DO_NOTHING)
     cumulative_distance = models.DecimalField(max_digits=10, decimal_places=3)
     distance = models.DecimalField(max_digits=10, decimal_places=3)
     cumulative_time = models.DecimalField(max_digits=10, decimal_places=3)

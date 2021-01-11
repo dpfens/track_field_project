@@ -135,6 +135,7 @@ class Location(base_models.BaseModel):
     A location based on geographic coordinates and elevation
     """
     id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=300, null=True, blank=True)
     place_id = models.CharField(max_length=300)
     geonames_id = models.PositiveIntegerField(blank=True, null=True)
     formatted_address = models.CharField(max_length=200)
@@ -184,7 +185,7 @@ class Venue(base_models.BaseModel):
     """
     name = models.CharField(max_length=100, blank=True, null=True)
     slug = models.CharField(unique=True, max_length=50)
-    address = models.ForeignKey(Address, models.DO_NOTHING)
+    address = models.ForeignKey(Address, models.DO_NOTHING, blank=True, null=True)
 
     def get_absolute_url(self):
         return reverse('geography.views.venue_details', args=[str(self.slug)])

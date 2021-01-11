@@ -6,6 +6,7 @@ from sport import models
 from django.contrib.auth.models import User
 from identity import models as identity_models
 from geography import models as geography_models
+from sport.models import athletics as athletics_models
 import utility
 import json
 
@@ -89,63 +90,57 @@ class Migration(migrations.Migration):
 
         outdoor_environment = models.Environment.objects.filter(name='Outdoor').first()
         if not outdoor_environment:
-            outdoor_environment = models.Environment(name='Outdoor', description='', created_by=superuser_identity)
-            outdoor_environment.save()
-
-        sporting_event_type = models.SportingEventType.objects.filter(name='Road Race').first()
-        if not sporting_event_type:
-            sporting_event_type = models.SportingEventType(name='Road Race', description='', created_by=superuser_identity)
-            sporting_event_type.save()
+            outdoor_environment = models.Environment.objects.create(name='Outdoor', description='', created_by=superuser_identity)
 
         venue_name = 'Valencia, City of Arts and Sciences'
         venue = geography_models.Venue.objects.filter(name=venue_name).first()
         if not venue:
             venue_slug = venue_name.lower().replace(' ', '-').replace(',', '')
-            venue = geography_models.Venue(name=venue_name, slug=venue_slug, created_by=superuser_identity)
-            venue.save()
+            venue = geography_models.Venue.objects.create(name=venue_name, slug=venue_slug)
 
         activity = models.Activity.objects.get(name='Running')
         field_of_play = models.FieldOfPlay.objects.filter(venue=venue, name=venue_name).first()
         if not field_of_play:
             established = datetime(1981, 12, 5)
             retired = None
-            field_of_play = models.FieldOfPlay.create(venue=venue, name=venue_name, established=established, retired=retired, created_by=superuser_identity)
+            field_of_play = models.FieldOfPlay.objects.create(venue=venue, name=venue_name, established=established, retired=retired, created_by=superuser_identity)
+
+        meters = utility.models.Unit.objects.filter(name='Meter').first()
+        course = athletics_models.Course.objects.filter(field_of_play=field_of_play, distance=42195, distance_unit=meters).first()
+        if not course:
+            course_type = athletics_models.CourseType.objects.filter(name='Road').first()
+            course = athletics_models.Course.objects.create(course_type=course_type, field_of_play=field_of_play, distance=42195, distance_unit=meters, created_by=superuser_identity)
 
         event_url = 'https://www.valenciaciudaddelrunning.com/en/marathon'
-        event = models.Event.create(environment=outdoor_environment, venue=venue, name=u'Maratón de Valencia', slug='valencia-marathon', url=event_url, created_by=superuser_identity)
+        event_type = models.EventType.objects.filter(name='Sport').first()
+        event = models.Event.objects.create(event_type=event_type, environment=outdoor_environment, name=u'Maratón de Valencia', slug='valencia-marathon', website=event_url, created_by=superuser_identity)
 
         event_start_date = datetime(2014, 12, 1)
         event_end_date = datetime(2014, 12, 3)
         event_url = 'https://www.valenciaciudaddelrunning.com/en/marathon/previous-editions-marathon/ranking-marathon-2014/'
-        event_instance = models.EventInstance.create(event=event, name=meet_name, slug='2014-valencia-marathon', start_date=event_start_date, end_date=event_end_date, url=event_url, participants=0, created_by=superuser_identity)
+        meet_name = '2014 Valencia Marathon'
+        event_instance = models.EventInstance.objects.create(event=event, name=meet_name, slug='2014-valencia-marathon', start_date=event_start_date, end_date=event_end_date, website=event_url, participants=0, created_by=superuser_identity)
 
-        scoring = models.Scoring.objects.get(name='Minimization')
-
-        marathon_event = models.Event.objects.filter(name='Marathon').first()
         competition_type = models.CompetitionType.objects.filter(name='Race').first()
         run_mode = models.Mode.objects.filter(name='Run').first()
+        game_instance = models.Game.objects.get(name='Race')
 
-        competition = models.Competition.objects.filter(sporting_event=sporting_event, competition_type=competition_type, scoring=scoring, name='Marathon', slug='2014-valencia-marathon').first()
+        competition = models.Competition.objects.filter(event=event_instance, competition_type=competition_type, game=game_instance, activity=activity, field_of_play=field_of_play, name='Marathon', slug='2014-valencia-marathon').first()
         if not competition:
-            competition = models.Competition(sport=sport, competition_type=competition_type, sporting_event=sporting_event, scoring=scoring, field_of_play=field_of_play, name='Marathon', slug='2014-valencia-marathon', url='', participants=0, created_by=superuser_identity)
-            competition.save()
+            competition = models.Competition.objects.create(event=event_instance, competition_type=competition_type, game=game_instance, activity=activity, field_of_play=field_of_play, name='Marathon', slug='2014-valencia-marathon', url='', participants=0, created_by=superuser_identity)
 
-            competition_event = models.CompetitionEvent(competition=competition, event=marathon_event, subevent=None, created_by=superuser_identity)
-            competition_event.save()
-
-            models.CompetitionRace.objects.create(competition=competition, start_interval=0, distance=42195, mode=run_mode, created_by=superuser_identity)
+            athletics_models.CompetitionRace.objects.create(competition=competition, course=course, start_interval=0, distance=42195, distance_unit=meters, mode=run_mode, created_by=superuser_identity)
 
         tier = models.Tier.objects.filter(name='Finals').first()
 
-        heat = models.Heat.objects.filter(competition=competition, name='Open').first()
+        heat = athletics_models.Heat.objects.filter(competition=competition, name='Open').first()
         if not heat:
-            heat = models.Heat(competition=competition, tier=tier, name='Open', is_overall=True, created_by=superuser_identity)
-            heat.save()
+            heat = athletics_models.Heat.objects.create(competition=competition, tier=tier, name='Open', is_overall=True, created_by=superuser_identity)
 
         seconds_unit = utility.models.Unit.objects.filter(name='Second').first()
         complete_outcome_state = models.OutcomeState.objects.filter(code='CPLT').first()
 
-        finished_race_outcome_state = models.RaceOutcomeState.objects.filter(code='FINISH').first()
+        finished_race_outcome_state = athletics_models.RaceOutcomeState.objects.filter(code='FINISH').first()
         verified_legitimacy = models.Legitimacies.objects.filter(name='Verified').first()
 
         person_entity_type = identity_models.EntityType.objects.filter(name='Person').first()
@@ -156,7 +151,7 @@ class Migration(migrations.Migration):
         org_identity_type = identity_models.IdentityType.objects.filter(name='Organization').first()
         club_org_type = identity_models.OrganizationType.objects.filter(name='Club').first()
 
-        file_name = 'athletics/migrations/meets/open_meet.json'
+        file_name = 'sport/migrations/data/athletics/open_meet.json'
         with open(file_name, 'r') as input_file:
             data = json.load(input_file)
         total_rows = len(data)
@@ -199,8 +194,7 @@ class Migration(migrations.Migration):
                     gender = identity_models.Gender.objects.filter(name='Male').first()
                 else:
                     gender = identity_models.Gender.objects.filter(name='Female').first()
-                identity_person = identity_models.IdentityPerson(identity=person_identity, gender=gender, given_name=first_name, middle_name=middle_name, last_name=last_name, created_by=superuser_identity)
-                identity_person.save()
+                identity_person = identity_models.IdentityPerson.objects.create(identity=person_identity, gender=gender, given_name=first_name, middle_name=middle_name, last_name=last_name, created_by=superuser_identity)
 
             if club != 'INDEPENDIENTE':
                 club_entity = create_entity(club, org_entity_type, superuser_identity, aliases=[club])
@@ -210,18 +204,17 @@ class Migration(migrations.Migration):
                 club_identity = None
                 unattached = True
 
-            outcome = models.Outcome.objects.filter(competition=competition, organization=club_identity, identity=person_identity).first()
+            outcome = models.Outcome.objects.filter(event=event_instance, competition=competition, organization=club_identity, identity=person_identity).first()
             if not outcome:
                 time = parse_time(raw_time)
-                outcome = models.Outcome.objects.create(competition=competition, organization=club_identity, identity=person_identity, field_of_play=field_of_play, value=time, unit=seconds_unit, place=place, state=complete_outcome_state, legitimacy=verified_legitimacy, type=outcome_type, created_by=superuser_identity)
-                models.RaceOutcome.objects.create(outcome=outcome, heat=heat, mode=run_mode, bib=bib, points=None, state=finished_race_outcome_state, unattached=unattached, created_by=superuser_identity)
-
+                outcome = models.Outcome.objects.create(event=event_instance, competition=competition, organization=club_identity, identity=person_identity, field_of_play=field_of_play, value=time, unit=seconds_unit, place=place, state=complete_outcome_state, legitimacy=verified_legitimacy, type=outcome_type, created_by=superuser_identity)
+                athletics_models.RaceOutcome.objects.create(outcome=outcome, heat=heat, mode=run_mode, bib=bib, points=None, state=finished_race_outcome_state, unattached=unattached, created_by=superuser_identity)
 
     def create_track_field_race(app, schema_editor):
-        file_name = 'athletics/migrations/meets/open_meet.json'
+        file_name = 'sport/migrations/data/athletics/open_meet.json'
 
     def create_track_field_field(app, schema_editor):
-        file_name = 'athletics/migrations/meets/open_meet.json'
+        file_name = 'sport/migrations/data/athletics/open_meet.json'
 
     def create_track_field_relay(app, schema_editor):
         superuser = User.objects.filter(is_superuser=True).first()
@@ -231,64 +224,63 @@ class Migration(migrations.Migration):
 
         category = models.Category.objects.filter(name='European Athletics Events').first()
         if not category:
-            category = models.Category(name='European Athletics Events', description='', created_by=superuser_identity)
-            category.save()
-
-        sporting_event_type = models.SportingEventType.objects.filter(name='Track & Field').first()
-        if not sporting_event_type:
-            sporting_event_type = models.SportingEventType(name='Track & Field', description='', created_by=superuser_identity)
-            sporting_event_type.save()
+            category = models.Category.objects.create(name='European Athletics Events', description='')
 
         indoor_environment = models.Environment.objects.filter(name='Indoor').first()
         if not indoor_environment:
-            indoor_environment = models.Environment(name='Indoor', description='', created_by=superuser_identity)
-            indoor_environment.save()
+            indoor_environment = models.Environment.objects.create(name='Indoor', description='', created_by=superuser_identity)
 
         venue_name = 'Ferry-Dusika-Hallenstadion'
         venue = geography_models.Venue.objects.filter(name=venue_name).first()
         if not venue:
-            venue = geography_models.Venue(name=venue_name, created_by=superuser_identity)
-            venue.save()
+            venue = geography_models.Venue.objects.create(name=venue_name)
 
+        activity_instance = models.Activity.objects.filter(name='Running').first()
         field_of_play_name = 'FHD - 200m Track'
         field_of_play = models.FieldOfPlay.objects.filter(name=field_of_play_name, venue=venue).first()
         if not field_of_play:
-            running_sport = models.Sport.objects.get(name='Running')
             established = datetime(1976, 1, 1)
             retired = None
-            field_of_play = models.FieldOfPlay.objects.create(name=field_of_play_name, sport=running_sport, venue=venue, established=established, retired=None, created_by=superuser_identity)
-            field_of_play.save()
+            field_of_play = models.FieldOfPlay.objects.create(name=field_of_play_name, venue=venue, established=established, retired=retired, created_by=superuser_identity)
+
+        meters = utility.models.Unit.objects.filter(name='Meter').first()
+        course_type = athletics_models.CourseType.objects.filter(name='Road').first()
+        course = athletics_models.Course.objects.filter(course_type=course_type, field_of_play=field_of_play, distance=200, distance_unit=meters).first()
+        if not course:
+            course = athletics_models.Course.objects.create(course_type=course_type, field_of_play=field_of_play, distance=200, distance_unit=meters, created_by=superuser_identity)
+
+        event_name = "European Athletics Indoor Championships"
+        event_slug = 'european-athletics-indoor-championships'
+        event_type = models.EventType.objects.filter(name='Sport').first()
+        event = models.Event.objects.filter(event_type=event_type, environment=indoor_environment, name=event_name, slug=event_slug).first()
+        if not event:
+            event = models.Event.objects.create(event_type=event_type, environment=indoor_environment, name=event_name, slug=event_slug, created_by=superuser_identity)
 
         meet_start_date = datetime(2002, 3, 1)
         meet_end_date = datetime(2002, 3, 3)
         meet_url = "http://www.european-athletics.org/competitions/european-athletics-indoor-championships/history/year=2002/results/index.html"
-        sporting_event = models.SportingEvent.objects.filter(venue=venue, name="27th European Athletics Indoor Championships").first()
-        if not sporting_event:
-            sporting_event = models.SportingEvent(sporting_event_type=sporting_event_type, environment=indoor_environment, venue=venue, name="27th European Athletics Indoor Championships", start_date=meet_start_date, end_date=meet_end_date, url=meet_url, championship=True, participants=0, created_by=superuser_identity)
-            sporting_event.save()
+        event_instance = models.EventInstance.objects.filter(event=event, name="27th European Athletics Indoor Championships").first()
+        if not event_instance:
+            event_instance = models.EventInstance.objects.create(event=event, name="27th European Athletics Indoor Championships", start_date=meet_start_date, end_date=meet_end_date, website=meet_url, participants=0, created_by=superuser_identity)
 
         seconds_unit = utility.models.Unit.objects.filter(name='Second').first()
         complete_outcome_state = models.OutcomeState.objects.filter(code='CPLT').first()
 
         run_mode = models.Mode.objects.filter(name='Run').first()
-        event = models.Event.objects.filter(name='4 x 400m Relay').first()
         competition_type = models.CompetitionType.objects.filter(name='Race').first()
         outcome_type = models.OutcomeType.objects.filter(name='Valid').first()
 
-        competition = models.Competition.objects.filter(sporting_event=sporting_event, field_of_play=field_of_play, name='4 x 400m Men', slug='4-400m-men').first()
-        scoring = models.Scoring.objects.get(name='Minimization')
-        if not competition:
-            competition = models.Competition(competition_type=competition_type, sport=running_sport, scoring=scoring, field_of_play=field_of_play, sporting_event=sporting_event, name='4 x 400m Men', slug='4-400m-men', description='', url=meet_url, participants=0, created_by=superuser_identity)
-            competition.save()
+        game_instance = models.Game.objects.get(name='Race')
 
-            models.CompetitionEvent.objects.create(competition=competition, event=event, subevent=None, created_by=superuser_identity)
-            models.CompetitionRace.objects.create(competition=competition, start_interval=0, mode=run_mode, distance=1600, created_by=superuser_identity)
+        competition = models.Competition.objects.filter(event=event_instance, activity=activity_instance, field_of_play=field_of_play, game=game_instance, name='4 x 400m Men', slug='4-400m-men').first()
+        if not competition:
+            competition = models.Competition.objects.create(event=event_instance, competition_type=competition_type, activity=activity_instance, field_of_play=field_of_play, game=game_instance, name='4 x 400m Men', slug='4-400m-men', description='', url=meet_url, participants=0, created_by=superuser_identity)
+            athletics_models.CompetitionRace.objects.create(competition=competition, course=course, start_interval=0, mode=run_mode, distance=1600, distance_unit=meters, created_by=superuser_identity)
 
         finals_tier = models.Tier.objects.filter(name='Finals').first()
         heat = models.Heat.objects.filter(competition=competition, tier=finals_tier).first()
         if not heat:
-            heat = models.Heat(competition=competition, tier=finals_tier, name='Overall', is_overall=True, created_by=superuser_identity)
-            heat.save()
+            heat = models.Heat.objects.create(competition=competition, tier=finals_tier, name='Overall', is_overall=True, created_by=superuser_identity)
 
         org_entity_type = identity_models.EntityType.objects.filter(name='Organization').first()
         org_identity_type = identity_models.IdentityType.objects.filter(name='Organization').first()
@@ -298,12 +290,14 @@ class Migration(migrations.Migration):
         relay_identity = create_identity(team_entity,  'Poland1', 'Poland', relay_identity_type, superuser_identity, organization=team_identity)
 
         verified_legitimacy = models.Legitimacies.objects.filter(name='Verified').first()
-        finished_race_outcome_state = models.RaceOutcomeState.objects.filter(code='FINISH').first()
+        finished_race_outcome_state = athletics_models.RaceOutcomeState.objects.filter(code='FINISH').first()
 
-        outcome = models.Outcome.objects.filter(competition=competition, organization=team_identity, identity=relay_identity).first()
+        outcome = models.Outcome.objects.filter(event=event_instance, competition=competition, organization=team_identity, identity=relay_identity).first()
         if not outcome:
-            outcome = models.Outcome.objects.create(competition=competition, organization=team_identity, identity=relay_identity, field_of_play=field_of_play, value=185.5, unit=seconds_unit, place=1, state=complete_outcome_state, legitimacy=verified_legitimacy, type=outcome_type, created_by=superuser_identity)
-            race_outcome = models.RaceOutcome.objects.create(outcome=outcome, heat=heat, mode=run_mode, bib=None, points=1, state=finished_race_outcome_state, unattached=False, reaction_time=None, wind=None, created_by=superuser_identity)
+            outcome = models.Outcome.objects.create(event=event_instance, competition=competition, organization=team_identity, identity=relay_identity, field_of_play=field_of_play, value=185.5, unit=seconds_unit, place=1, state=complete_outcome_state, legitimacy=verified_legitimacy, type=outcome_type, created_by=superuser_identity)
+            race_outcome = athletics_models.RaceOutcome.objects.create(outcome=outcome, heat=heat, mode=run_mode, bib=None, points=1, state=finished_race_outcome_state, unattached=False, reaction_time=None, wind=None, created_by=superuser_identity)
+        else:
+            race_outcome = athletics_models.RaceOutcome.objects.filter(outcome=outcome).first()
 
         athlete_data = [
             {
@@ -354,10 +348,12 @@ class Migration(migrations.Migration):
                 athlete_person = identity_models.IdentityPerson(identity=athlete_identity, gender=gender, given_name=first_name, last_name=last_name, date_of_birth=born, created_by=superuser_identity)
                 athlete_person.save()
 
-            relay_member = models.RelayOrder.objects.filter(race_outcome=race_outcome, identity=athlete_identity).first()
+            if athletics_models.RelayMember.objects.filter(relay=relay_identity, identity=athlete_identity, is_alternate=False).exists():
+                athletics_models.RelayMember.objects.create(relay=relay_identity, identity=athlete_identity, is_alternate=False)
+
+            relay_member = athletics_models.RelayOrder.objects.filter(race_outcome=race_outcome, relay=relay_identity, identity=athlete_identity).first()
             if not relay_member:
-                relay_member = models.RelayOrder(race_outcome=race_outcome, identity=athlete_identity, sequence=index + 1, distance=400, created_by=superuser_identity)
-                relay_member.save()
+                relay_member = athletics_models.RelayOrder.objects.create(race_outcome=race_outcome, relay=relay_identity, identity=athlete_identity, sequence=index + 1, distance=400, created_by=superuser_identity)
 
     operations = [
         migrations.RunPython(create_open_meet),

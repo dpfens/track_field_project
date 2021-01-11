@@ -133,7 +133,7 @@ class Competition(base_models.BaseAuditModel):
     event = models.ForeignKey('EventInstance', models.DO_NOTHING, blank=True, null=True)
     division = models.ForeignKey('Division', models.DO_NOTHING, blank=True, null=True)
     activity = models.ForeignKey('Activity', models.DO_NOTHING)
-    game = models.ForeignKey(Game, models.DO_NOTHING)
+    game = models.ForeignKey('Game', models.DO_NOTHING)
     field_of_play = models.ForeignKey('FieldOfPlay', models.DO_NOTHING, blank=True, null=True)
     scoring_units = models.ForeignKey('utility.Quantity', models.DO_NOTHING, blank=True, null=True)
     objective = models.CharField(max_length=250, null=True, blank=True)
@@ -210,6 +210,7 @@ class EventType(base_models.BaseModel):
 
 
 class Event(base_models.BaseAuditModel):
+    parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True, related_name='child_events')
     event_type = models.ForeignKey('EventType', models.DO_NOTHING)
     environment = models.ForeignKey(Environment, models.DO_NOTHING)
     name = models.CharField(max_length=100)
@@ -246,6 +247,7 @@ class EventInstance(base_models.BaseAuditModel):
     """
     A specific occurrence of an event
     """
+    parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True, related_name='child_event_instances')
     event = models.ForeignKey(Event, models.DO_NOTHING)
     name = models.CharField(max_length=100)
     slug = models.CharField(unique=True, max_length=100)
@@ -284,7 +286,6 @@ class FieldOfPlay(base_models.BaseAuditModel):
     A place where an activity can be performed
     """
     id = models.BigAutoField(primary_key=True)
-    activity = models.ForeignKey('Activity', models.DO_NOTHING)
     venue = models.ForeignKey('geography.Venue', models.DO_NOTHING, related_name='fields_of_play')
     name = models.CharField(max_length=50)
     website = models.URLField(max_length=255, null=True, blank=True)
@@ -308,24 +309,21 @@ class Game(base_models.BaseAuditModel):
 
     Example: A running race, chess, etc.
     """
-    activity = models.ForeignKey(Activity, models.DO_NOTHING)
     type = models.ForeignKey('GameType', models.DO_NOTHING)
-    name = models.CharField(max_length=50)
+    name = models.CharField(unique=True, max_length=50)
     description = models.TextField()
     objective = models.TextField()
     scoring_evaluation = models.ForeignKey('ScoringEvaluation', models.DO_NOTHING)
     scoring_mechanism = models.ForeignKey('ScoringMechanism', models.DO_NOTHING)
     scoring_quantity = models.ForeignKey('utility.Quantity', models.DO_NOTHING)
     economics = models.ForeignKey('GameEconomics', models.DO_NOTHING)
-    is_team = models.BooleanField()
     is_perfect_information = models.BooleanField()
     is_symmetric = models.BooleanField()
     is_cooperative = models.BooleanField()
-    is_simultaneous = models.BooleanField()
     is_move_by_nature = models.BooleanField()
 
     class Meta:
-        unique_together = (('activity', 'scoring_evaluation', 'scoring_mechanism', 'scoring_type', 'economics', 'scoring_quantity'), ('activity', 'name'))
+        unique_together = (('name', 'scoring_evaluation', 'scoring_mechanism', 'type', 'economics', 'scoring_quantity'),)
 
 
 class Legitimacies(base_models.BaseModel):
@@ -347,6 +345,7 @@ class Outcome(base_models.BaseAuditModel):
     A base table for describing the outcome of activities for a given identity
     """
     type = models.ForeignKey('OutcomeType', models.DO_NOTHING, null=True)
+    event = models.ForeignKey(EventInstance, models.DO_NOTHING)
     field_of_play = models.ForeignKey(FieldOfPlay, models.DO_NOTHING)
     competition = models.ForeignKey(Competition, models.DO_NOTHING)
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='performances')

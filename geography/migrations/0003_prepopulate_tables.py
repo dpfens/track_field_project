@@ -329,9 +329,19 @@ class Migration(migrations.Migration):
                 instance = geography.models.VenueType(name=name)
                 instance.save()
 
+    def add_terrain(apps, schema_editor):
+        terrains = ('Canyon', 'Desert', 'Forest', 'Jungle', 'Glacier', 'Hill', 'Marsh', 'Mountain', 'Oasis', 'River', 'Ocean', 'Tundra', 'Plains')
+        for name in terrains:
+            try:
+                instance = geography.models.Terrain.objects.get(name=name)
+            except Exception:
+                instance = geography.models.VenueType(name=name, description='')
+                instance.save()
+
     operations = [
         migrations.RunPython(add_continents),
         migrations.RunPython(add_countries),
         migrations.RunPython(add_venue_types),
         migrations.RunPython(add_address_component_types),
+        migrations.RunPython(add_terrain)
     ]

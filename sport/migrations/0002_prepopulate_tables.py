@@ -26,11 +26,40 @@ class Migration(migrations.Migration):
                 competition_type = sport.models.CompetitionType(name=name, description='')
                 competition_type.save()
 
+    def course_type(apps, schema_editor):
+        types = ['Track', 'Trail', 'Road']
+
+        for name in types:
+            try:
+                course_type = sport.models.CourseType.objects.get(name=name)
+            except Exception:
+                course_type = sport.models.CourseType(name=name, description='')
+                course_type.save()
+
     def add_scoring_mechanism(apps, schema_editor):
-        names = ['Threshold', 'Endurance']
-        for name in names:
+        mechanisms = [
+            {
+                'name': 'Best Performance',
+                'description': 'The competitors have a single attempt, where their score is used for scoring.'
+            },
+            {
+                'name': 'Threshold',
+                'description': 'Competitor\'s performance must exceed a defined value.'
+            },
+            {
+                'name': 'Endurance',
+                'description': 'Competitors must exceed a given value for as many consecutive times as possible.'
+            },
+            {
+                'name': 'Best Attempt',
+                'description': 'Competitors compete multiple times, where their best attempt is used in scoring.'
+            },
+        ]
+        for mechanism in mechanisms:
+            name = mechanism['name']
             if not sport.models.ScoringMechanism.objects.filter(name=name).exists():
-                instance = sport.models.ScoringMechanism(name=name, description='')
+                description = mechanism['description']
+                instance = sport.models.ScoringMechanism(name=name, description=description)
                 instance.save()
 
     def add_scoring_evaluation(apps, schema_editor):
@@ -48,17 +77,50 @@ class Migration(migrations.Migration):
                 instance.save()
 
     def add_game_types(apps, schema_editor):
-        names = ['Minimization', 'Maximization']
+        names = ['Simultaneous', 'Sequential']
         for name in names:
             if not sport.models.GameType.objects.filter(name=name).exists():
                 instance = sport.models.GameType(name=name, description='')
                 instance.save()
 
     def add_games(apps, schema_editor):
-        names = ['Race', 'Time Trial']
-        for name in names:
+        superuser = User.objects.filter(is_superuser=True).first()
+        superuser_identity = identity.models.Identity.objects.get(user_id=superuser.id)
+        games = [
+            {
+                'name': 'Race',
+                'economics': 'Zero Sum',
+                'type': 'Simultaneous',
+                'evaluation': 'Minimization',
+                'mechanism': 'Best Performance',
+                'quantity': 'Time',
+                'is_perfect_information': False
+            },
+            {
+                'name': 'Time Trial',
+                'economics': 'Zero Sum',
+                'type': 'Sequential',
+                'evaluation': 'Minimization',
+                'mechanism': 'Best Performance',
+                'quantity': 'Time',
+                'is_perfect_information': False
+            }
+        ]
+        for game in games:
+            name = game['name']
             if not sport.models.Game.objects.filter(name=name).exists():
-                instance = sport.models.Game(name=name, description='')
+                economics = game['economics']
+                type = game['type']
+                evaluation = game['evaluation']
+                mechanism = game['mechanism']
+                quantity = game['quantity']
+                is_perfect_information = game['is_perfect_information']
+                economics_instance = sport.models.GameEconomics.objects.get(name=economics)
+                type_instance = sport.models.GameType.objects.get(name=type)
+                evaluation_instance = sport.models.ScoringEvaluation.objects.get(name=evaluation)
+                mechanism_instance = sport.models.ScoringMechanism.objects.get(name=mechanism)
+                quantity_instance = utility.models.Quantity.objects.get(name=quantity)
+                instance = sport.models.Game(name=name, description='', economics=economics_instance, type=type_instance, scoring_evaluation=evaluation_instance, scoring_mechanism=mechanism_instance, scoring_quantity=quantity_instance, is_perfect_information=is_perfect_information, is_symmetric=False, is_cooperative=False, is_move_by_nature=False, created_by=superuser_identity)
                 instance.save()
 
     def add_activities(apps, schema_editor):
@@ -83,13 +145,13 @@ class Migration(migrations.Migration):
             for activity_name in activities:
                 parent_activity = sport.models.Activity.objects.filter(type=type_instance, name=activity_name).first()
                 if not parent_activity:
-                    parent_activity = sport.models.Activity(type=type_instance, name=activity_name, description='', wikipedia='', created_by=superuser_identity)
+                    parent_activity = sport.models.Activity(type=type_instance, name=activity_name, description='', wikipedia='', is_group=False, created_by=superuser_identity)
                     parent_activity.save()
 
                 for child_activity_name in activities[activity_name]:
                     child_activity = sport.models.Activity.objects.filter(type=type_instance, parent=parent_activity, name=child_activity_name).first()
                     if not child_activity:
-                        child_activity = sport.models.Activity(type=type_instance, parent=parent_activity, name=child_activity_name, description='', wikipedia='', created_by=superuser_identity)
+                        child_activity = sport.models.Activity(type=type_instance, parent=parent_activity, name=child_activity_name, description='', wikipedia='', is_group=True, created_by=superuser_identity)
                         child_activity.save()
 
 
@@ -200,6 +262,11 @@ class Migration(migrations.Migration):
                 instance = sport.models.Mode(name=name, description='')
                 instance.save()
 
+    def add_event_types(apps, schema_editor):
+        event_types = ('Sport', 'Social')
+        for type in event_types:
+            if not sport.models.EventType.objects.filter(name=type).exists():
+                event_type = sport.models.EventType.objects.create(name=type, description='')
 
     def add_social_class(apps, schema_editor):
         data = [{
@@ -287,6 +354,8 @@ class Migration(migrations.Migration):
         migrations.RunPython(add_modes),
         migrations.RunPython(add_legitimacies),
         migrations.RunPython(add_social_class),
+        migrations.RunPython(add_event_types),
         migrations.RunPython(competition_type),
+        migrations.RunPython(course_type),
         migrations.RunPython(add_outcome_types)
     ]
