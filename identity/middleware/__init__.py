@@ -7,7 +7,8 @@ class IdentityMiddleware(object):
         self.get_response = get_response
 
     def __call__(self, request):
-        if not request.session.get('identity'):
+        identity_id = request.session.get('identity')
+        if not identity_id:
             if request.user.is_authenticated:
                 try:
                     identity = models.Identity.objects.get(user_id=request.user.id)
@@ -29,5 +30,10 @@ class IdentityMiddleware(object):
                     identity = models.Identity(identity_type=identity_type, user_id=None, is_private=True, identifier=raw_ip_address, created_by=None)
                     identity.save()
             request.session['identity'] = identity.id
+        else:
+            identity = models.Identity.objects.get(pk=identity_id)
+
+        request.identity = identity
+
         response = self.get_response(request)
         return response

@@ -15,17 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.i18n import JavaScriptCatalog
+
 from track_field_project.admin.site import advanced_admin
 from track_field_project import views
-from django.views.i18n import JavaScriptCatalog
+
 
 
 urlpatterns = [
     path(r'', views.IndexView.as_view(), name='home'),
     path('about/', views.AboutView.as_view(), name='about'),
     path('pages/', include('django.contrib.flatpages.urls')),
-    path('account/', include('identity.urls')),
-    path('utility/', include('utility.urls')),
+    path('geography/', include('geography.urls', namespace='geography')),
+    path('account/', include('identity.urls', namespace='identity')),
+    path('utility/', include('utility.urls', namespace='utility')),
+    path('web-analytics/', include('webanalytics.urls', namespace='webanalytics')),
     path('js-settings.js', views.js_settings, name='js_settings'),
     path('admin/', admin.site.urls),
     path('advanced-admin/', advanced_admin.urls),

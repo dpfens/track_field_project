@@ -39,9 +39,11 @@ class Annotation(base_models.BaseAuditModel):
     id = models.BigAutoField(primary_key=True)
     annotation_type = models.ForeignKey('AnnotationType', models.DO_NOTHING)
     content = models.TextField()
-    is_public = models.BooleanField()
+    is_public = models.BooleanField(default=True)
     verified_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='verified_by', blank=True, null=True)
     verified_at = models.DateTimeField(blank=True, null=True)
+    is_flagged = models.BooleanField(default=False)
+    flagged_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='flagged_by', blank=True, null=True, related_name='flagged_annotations')
 
 
 class AnnotationType(base_models.BaseModel):
@@ -108,13 +110,8 @@ class Comment(base_models.BaseAuditModel):
     Differs from an annotation in that Comments are intended for replies and
     discussion
     """
-    id = models.BigAutoField(primary_key=True)
-    reply_to_comment = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
-    identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
-    subject = models.CharField(max_length=255)
-    content = models.TextField()
-    is_flagged = models.BooleanField()
-    flagged_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='flagged_by', blank=True, null=True, related_name='flagged_comments')
+    annotation = models.ForeignKey(Annotation, models.DO_NOTHING)
+    reply_to = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
 
 
 class GameType(base_models.BaseModel):
@@ -142,7 +139,7 @@ class Competition(base_models.BaseAuditModel):
     name = models.CharField(max_length=255)
     slug = models.CharField(unique=True, max_length=100)
     description = models.TextField()
-    url = models.CharField(max_length=255)
+    url = models.URLField(null=True, blank=True)
     participants = models.PositiveIntegerField()
     expected_competitiveness = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
     actual_competitiveness = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
@@ -216,7 +213,7 @@ class Event(base_models.BaseAuditModel):
     name = models.CharField(max_length=100)
     slug = models.CharField(unique=True, max_length=100)
     description = models.CharField(max_length=255)
-    website = models.URLField(max_length=255, null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
     expected_competitiveness = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
     actual_competitiveness = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
     expected_eliteness = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)

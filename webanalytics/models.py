@@ -54,7 +54,7 @@ class DeviceType(base_models.BaseModel):
 class IpAddress(base_models.BaseModel):
     id = models.BigAutoField(primary_key=True)
     ip_address_type = models.ForeignKey('IpAddressType', models.DO_NOTHING)
-    value = models.CharField(max_length=32)
+    value = models.GenericIPAddressField()
 
     class Meta:
         db_table = 'analytics_ip_address'
@@ -179,7 +179,7 @@ class RequestType(base_models.BaseModel):
 
 class Url(base_models.BaseModel):
     id = models.BigAutoField(primary_key=True)
-    value = models.CharField(unique=True, max_length=250)
+    value = models.URLField(unique=True)
 
     class Meta:
         db_table = 'analytics_url'

@@ -1,10 +1,34 @@
-def preferences(request):
-    pass
+from django.views.generic.base import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-def profile(request):
-    pass
+class AccountView(TemplateView, LoginRequiredMixin):
+    template_name = "account.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
 
-def privacy(request):
-    pass
+class PreferenceView(TemplateView, LoginRequiredMixin):
+    template_name = "preference.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class ProfileView(TemplateView, LoginRequiredMixin):
+    template_name = "profile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class PrivacyView(TemplateView, LoginRequiredMixin):
+    template_name = "privacy.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

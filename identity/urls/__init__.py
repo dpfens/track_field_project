@@ -1,13 +1,15 @@
-from django.urls import include, path
+from django.urls import path
 from django.contrib.auth import views as auth_views
 from identity import views
 
 
+app_name = 'identity'
 urlpatterns = [
-    path('preferences/', views.preferences),
-    path('profile/', views.profile),
-    path('privacy', views.privacy),
+    path('preferences/', views.PreferenceView.as_view(), name='preferences'),
+    path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('privacy', views.PrivacyView.as_view(), name='privacy'),
 
+    path('login/', auth_views.LoginView.as_view(), 'login'),
     # password reset paths
     path('password/reset/', auth_views.PasswordResetView.as_view(), name='admin_password_reset'),
     path('password/reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done',),
