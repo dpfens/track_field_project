@@ -17,13 +17,15 @@ logger = logging.getLogger(__name__)
 class IndexView(View):
 
     def get(self, request):
-        return render(request, 'index.html', dict())
+        context = dict()
+        return render(request, 'index.html', context)
 
 
 class AboutView(View):
 
     def get(self, request):
-        return render(request, 'about.html', dict())
+        context = dict()
+        return render(request, 'about.html', context)
 
 
 # Create your views here.
