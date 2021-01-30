@@ -125,7 +125,9 @@ class Identity(base_models.BaseAuditModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     identifier = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
+    is_primary = models.BooleanField()
     is_private = models.BooleanField()
+    is_active = models.BooleanField()
     created_by = models.ForeignKey('identity.Identity', models.DO_NOTHING, db_column='created_by', related_name='%(class)s_created_by', null=True, blank=True)
 
     def get_absolute_url(self):

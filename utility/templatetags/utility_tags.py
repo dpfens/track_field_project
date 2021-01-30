@@ -52,3 +52,45 @@ class ParseNode(template.Node):
             context[self.var_name] = result
             result = ""
         return result
+
+
+@register.filter
+def duration(value):
+    """
+    Arguments:
+        value (int|float): Time in seconds
+
+    Returns:
+        str:  in the form of HH:MM:SS.MMMMM
+    """
+    raw_seconds = float(value)
+
+    if not raw_seconds:
+        return '00.00'
+
+    milliseconds = int((value * 1000) % 1000)
+    seconds = int(raw_seconds % 60)
+    minutes = int((raw_seconds / 60) % 60)
+    hours = int((raw_seconds / 3600) % 24)
+
+    output = ''
+    units = (hours, minutes, seconds)
+    unit_lengths = (2, 2, 2)
+    for unit, length in zip(units, unit_lengths):
+        if output or unit:
+            if output:
+                output += ':'
+            output += ('%d' % unit).zfill(length)
+
+    output += '.'
+    if milliseconds:
+        output += ('%d' % milliseconds).strip('0')
+    else:
+        output += '00'
+    return output
+
+
+@register.filter
+def distance(value):
+    output = float(value)
+    return '%sm' % value

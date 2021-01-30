@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'django_user_agents.middleware.UserAgentMiddleware',
     'utility.middleware.impersonate.ImpersonationMiddleware',
     'identity.middleware.IdentityMiddleware',
-    'analytics.middleware.RequestLoggingMiddleware'
+    'webanalytics.middleware.tracking.RequestLoggingMiddleware'
 ]
 
 ROOT_URLCONF = 'track_field_project.urls'
