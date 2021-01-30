@@ -4,6 +4,8 @@ from .base import *
 from .feedback import *
 from .measurement import *
 from .attributes import *
+from .lookups import *
+
 
 # Create your models here.
 class KnowledgeGraph(base_models.BaseAuditModel):
