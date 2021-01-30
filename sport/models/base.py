@@ -59,7 +59,7 @@ class AnnotationVote(base_models.BaseModel):
     Records up/down votes of an annotation
     """
     id = models.BigAutoField(primary_key=True)
-    annotation = models.ForeignKey(Annotation, models.DO_NOTHING)
+    annotation = models.ForeignKey(Annotation, models.CASCADE)
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING)
     up = models.IntegerField()
     down = models.IntegerField()
@@ -110,7 +110,7 @@ class Comment(base_models.BaseAuditModel):
     Differs from an annotation in that Comments are intended for replies and
     discussion
     """
-    annotation = models.ForeignKey(Annotation, models.DO_NOTHING)
+    annotation = models.ForeignKey(Annotation, models.CASCADE)
     reply_to = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
 
 
@@ -294,7 +294,7 @@ class GameEconomics(base_models.BaseModel):
     """
     The economics of a game
 
-    Example: Zero-sum, positive-sum
+    Example: Zero-sum, positive-sum, constant-sum
     """
     name = models.CharField(unique=True, max_length=100)
     description = models.CharField(max_length=255)

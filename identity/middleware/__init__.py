@@ -11,11 +11,11 @@ class IdentityMiddleware(object):
         if not identity_id:
             if request.user.is_authenticated:
                 try:
-                    identity = models.Identity.objects.get(user_id=request.user.id)
+                    identity = models.Identity.objects.get(user_id=request.user.id, is_primary=True)
                 except Exception:
                     user_id = request.user.id
                     identity_type = models.IdentityType.objects.get(name='User')
-                    identity = models.Identity(identity_type=identity_type, user_id=user_id, is_private=True, identifier=user_id, created_by=None)
+                    identity = models.Identity(identity_type=identity_type, user_id=user_id, is_private=True, is_primary=True, is_active=True, identifier=user_id, created_by=None)
                     identity.save()
             else:
                 x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -27,7 +27,7 @@ class IdentityMiddleware(object):
                     identity = models.Identity.objects.get(identifier=raw_ip_address)
                 except Exception:
                     identity_type = models.IdentityType.objects.get(name='Anonymous User')
-                    identity = models.Identity(identity_type=identity_type, user_id=None, is_private=True, identifier=raw_ip_address, created_by=None)
+                    identity = models.Identity(identity_type=identity_type, user_id=None, is_private=True, is_primary=True, is_active=True, identifier=raw_ip_address, created_by=None)
                     identity.save()
             request.session['identity'] = identity.id
         else:

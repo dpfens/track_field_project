@@ -1,7 +1,7 @@
 {% load i18n static %}<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="ltr"{% endif %}>
   <head>
-      {% if not debug and not user.is_authenticated and not dnt %}
+      {% if not debug and not request.DNT %}
       <!-- Google Tag Manager -->
       <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -16,7 +16,7 @@
   {% block prebody %}
   {% endblock %}
   <body>
-      {% if not debug and not user.is_authenticated and not dnt %}
+      {% if not debug and not request.DNT %}
       <!-- Google Tag Manager (noscript) -->
       <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-{{ GTM_ID }}"
           height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>

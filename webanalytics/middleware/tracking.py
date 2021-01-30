@@ -17,6 +17,12 @@ class RequestLoggingMiddleware(object):
             raise MiddlewareNotUsed('In DEBUG mode')
 
     def __call__(self, request):
+        do_not_track = request.headers.get('DNT', 0)
+        request.do_not_track = do_not_track
+
+        if request.do_not_track:
+            return
+
         identity = request.identity
         now = datetime.now()
 

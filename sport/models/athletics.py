@@ -5,12 +5,12 @@ from utility.models import attributes as attribute_models
 
 
 class AnnotationAttempt(base_models.BaseAuditModel):
-    attempt = models.ForeignKey('Attempt', models.DO_NOTHING)
+    attempt = models.ForeignKey('Attempt', models.CASCADE)
     sequence = models.PositiveIntegerField()
 
 
 class AnnotationSplit(base_models.BaseAuditModel):
-    race_outcome = models.ForeignKey('RaceOutcome', models.DO_NOTHING)
+    race_outcome = models.ForeignKey('RaceOutcome', models.CASCADE)
     cumulative_distance = models.DecimalField(max_digits=10, decimal_places=3)
     distance = models.DecimalField(max_digits=10, decimal_places=3)
     cumulative_time = models.DecimalField(max_digits=10, decimal_places=3)

@@ -69,6 +69,8 @@ class EntityIdentity(base_models.BaseAuditModel):
     entity = models.ForeignKey(Entity, models.DO_NOTHING)
     identity = models.ForeignKey('Identity', models.DO_NOTHING)
     is_private = models.BooleanField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         unique_together = (('entity', 'identity'),)

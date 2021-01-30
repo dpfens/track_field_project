@@ -3,7 +3,7 @@
 from django.db import migrations
 from identity import models
 from django.contrib.auth.models import User
-from datetime import datetime
+from django.utils import timezone
 
 
 class Migration(migrations.Migration):
@@ -44,12 +44,12 @@ class Migration(migrations.Migration):
         superuser = User.objects.filter(is_superuser=True).first()
         superuser_identity = models.Identity.objects.get(user_id=superuser.id)
 
-        now = datetime.now()
+        now = timezone.now()
         organization_identity_type = models.IdentityType.objects.get(name='User')
         try:
-            organization_identity = models.Identity.objects.get(identity_type=organization_identity_type, is_private=False, identifier=0, created_by=superuser_identity)
+            organization_identity = models.Identity.objects.get(identity_type=organization_identity_type, is_private=False, is_primary=True, is_active=True, identifier=0, created_by=superuser_identity)
         except Exception:
-            organization_identity = models.Identity(identity_type=organization_identity_type, is_private=False, identifier=0, created_by=superuser_identity)
+            organization_identity = models.Identity(identity_type=organization_identity_type, is_private=False, is_primary=True, is_active=True, identifier=0, created_by=superuser_identity)
             organization_identity.save()
 
         organization_type = models.OrganizationType.objects.get(name='Business')
@@ -67,9 +67,9 @@ class Migration(migrations.Migration):
             entity.save()
 
         try:
-            entity_identity = models.EntityIdentity(entity=entity, identity=organization_identity, created_by=superuser_identity, is_private=False)
+            entity_identity = models.EntityIdentity(entity=entity, identity=organization_identity, created_by=superuser_identity, is_private=False, start_date=timezone.now())
         except Exception:
-            entity_identity = models.EntityIdentity(entity=entity, identity=organization_identity, created_by=superuser_identity, is_private=False)
+            entity_identity = models.EntityIdentity(entity=entity, identity=organization_identity, created_by=superuser_identity, is_private=False, start_date=timezone.now())
             entity_identity.save()
 
     def create_genders(apps, schema_editor):
@@ -93,9 +93,9 @@ class Migration(migrations.Migration):
 
         identity_type = models.IdentityType.objects.get(name='User')
         try:
-            models.Identity.objects.get(user=superuser, identity_type=identity_type, is_private=False, identifier=superuser.id, created_by=None)
+            models.Identity.objects.get(user=superuser, identity_type=identity_type, is_private=False, is_primary=True, is_active=True, identifier=superuser.id, created_by=None)
         except Exception:
-            superuser_identity = models.Identity(user=superuser, identity_type=identity_type, is_private=False, identifier=superuser.id, created_by=None)
+            superuser_identity = models.Identity(user=superuser, identity_type=identity_type, is_private=False, is_primary=True, is_active=True, identifier=superuser.id, created_by=None)
             superuser_identity.save()
             print('created %r' % superuser_identity)
 

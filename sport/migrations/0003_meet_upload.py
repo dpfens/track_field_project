@@ -2,6 +2,7 @@
 
 from django.db import migrations
 from datetime import datetime
+from django.utils import timezone
 from sport import models
 from django.contrib.auth.models import User
 from identity import models as identity_models
@@ -50,14 +51,14 @@ def create_identity(entity, id, name, identity_type, creator, **kwargs):
     existing_identity = identity_models.Identity.objects.filter(name=name, identifier=name, identity_type=identity_type).first()
     if not existing_identity:
         organization = kwargs.get('organization')
-        identity = identity_models.Identity(organization=organization, name=name, identifier=id, identity_type=identity_type, is_private=False, created_by=creator)
+        identity = identity_models.Identity(organization=organization, name=name, identifier=id, identity_type=identity_type, is_private=False, is_primary=True, is_active=True, created_by=creator)
         identity.save()
     else:
         identity = existing_identity
 
     existing_entity_identity = identity_models.EntityIdentity.objects.filter(entity=entity, identity=identity).first()
     if not existing_entity_identity:
-        entity_identity = identity_models.EntityIdentity(entity=entity, identity=identity, is_private=False, created_by=creator)
+        entity_identity = identity_models.EntityIdentity(entity=entity, identity=identity, is_private=False, start_date=timezone.now(), created_by=creator)
         entity_identity.save()
 
     organization_type = kwargs.get('organization_type')
