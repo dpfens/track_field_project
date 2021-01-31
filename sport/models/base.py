@@ -1,8 +1,8 @@
 from django.db import models
-from django.template.defaultfilters import slugify
 from django.urls import reverse
 
 from utility.models import base as base_models
+from utility.models import ownership as ownership_models
 from utility.models import attributes as attribute_models
 
 
@@ -122,7 +122,7 @@ class GameType(base_models.BaseModel):
     description = models.CharField(max_length=255)
 
 
-class Competition(base_models.BaseAuditModel):
+class Competition(base_models.BaseAuditModel, ownership_models.Ownership):
     """
     A base table for competition information
     """
@@ -206,7 +206,7 @@ class EventType(base_models.BaseModel):
     description = models.CharField(max_length=255)
 
 
-class Event(base_models.BaseAuditModel):
+class Event(base_models.BaseAuditModel, ownership_models.Ownership):
     parent = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True, related_name='child_events')
     event_type = models.ForeignKey('EventType', models.DO_NOTHING)
     environment = models.ForeignKey(Environment, models.DO_NOTHING)
@@ -240,7 +240,7 @@ class EventTrait(attribute_models.BaseTraitModel):
         unique_together = (('event', 'trait'),)
 
 
-class EventInstance(base_models.BaseAuditModel):
+class EventInstance(base_models.BaseAuditModel, ownership_models.Ownership):
     """
     A specific occurrence of an event
     """
@@ -337,7 +337,7 @@ class Legitimacies(base_models.BaseModel):
         verbose_name_plural = 'legitimacies'
 
 
-class Outcome(base_models.BaseAuditModel):
+class Outcome(base_models.BaseAuditModel, ownership_models.Ownership):
     """
     A base table for describing the outcome of activities for a given identity
     """
