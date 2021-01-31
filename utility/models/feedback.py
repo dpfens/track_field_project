@@ -7,10 +7,16 @@ class Feedback(base_models.BaseModel):
     identity = models.ForeignKey('identity.Identity', on_delete=models.DO_NOTHING, null=True)
     email_address = models.CharField(max_length=100, null=True)
     url = models.CharField(max_length=250)
-    feedback_type = models.ForeignKey('FeedbackType', on_delete=models.CASCADE)
     content = models.TextField()
 
 
-class FeedbackType(base_models.BaseModel):
+class FeedbackLabel(base_models.BaseModel):
     name = models.CharField(max_length=150)
     description = models.CharField(max_length=250)
+    is_internal = models.BooleanField(default=False)
+
+
+class FeedbackLabels(base_models.BaseModel):
+    feedback = models.ForeignKey(Feedback, models.DO_NOTHING)
+    label = models.ForeignKey(FeedbackLabel, models.DO_NOTHING)
+    is_internal = models.BooleanField(default=False)

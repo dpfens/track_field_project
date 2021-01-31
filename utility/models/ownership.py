@@ -25,8 +25,18 @@ class Ownership(base_models.BaseAuditModel):
 
 
 class Provenance(base_models.BaseAuditModel):
+    """
+    History of ownership of an item
+    """
     item_type = models.ForeignKey(ContentType, models.DO_NOTHING)
     item = GenericForeignKey('content_type', 'object_id')
     identity = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='provenance')
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+
+
+class Delegation(base_models.BaseAuditModel):
+    delegator = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='delegations')
+    delegatee = models.ForeignKey('identity.Identity', models.DO_NOTHING, related_name='delegation_assignments')
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(blank=True, null=True)

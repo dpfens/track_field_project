@@ -46,6 +46,7 @@ class BaseAttributeModel(base_models.BaseAuditModel):
     is_primary = models.BooleanField()
     is_verified = models.BooleanField()
     is_private = models.BooleanField()
+    is_internal = models.BooleanField(default=False)
     start = models.DateTimeField()
     end = models.DateTimeField(blank=True, null=True)
 
@@ -64,6 +65,7 @@ class BaseTraitModel(base_models.BaseAuditModel):
     is_primary = models.BooleanField()
     is_verified = models.BooleanField()
     is_private = models.BooleanField()
+    is_internal = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
