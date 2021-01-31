@@ -10,13 +10,13 @@ class Address(base_models.BaseAuditModel):
     Information about a given postal address
     """
     raw = models.CharField(max_length=1000)
-    name = models.CharField(max_length=150)
-    company_name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, blank=True, null=True)
+    company_name = models.CharField(max_length=150, blank=True, null=True)
     street = models.CharField(max_length=150)
     area_district = models.CharField(max_length=150)
     city = models.CharField(max_length=50)
-    county = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
+    county = models.CharField(max_length=50, blank=True, null=True)
+    province = models.CharField(max_length=50)
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=3)
 
@@ -110,6 +110,25 @@ class Currency(base_models.BaseModel):
     name = models.CharField(max_length=50)
 
 
+class IPAddressLocation(base_models.BaseModel):
+    """
+    Linking a location to an address
+    """
+    ip_address = models.ForeignKey('webanalytics.IPAddress', models.DO_NOTHING)
+    location = models.ForeignKey('Location', models.DO_NOTHING)
+    isp = models.Foreign('InternetServiceProvider', models.DO_NOTHING, blank=True, null=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+
+class InternetServiceProvider(base_models.BaseModel):
+    """
+    Internet Service Providers
+    """
+    name = models.CharField(max_length=50)
+    description = models.Charfield(max_length=250)
+
+
 class Language(base_models.BaseModel):
     """
     Identifiers of languages
@@ -142,6 +161,7 @@ class Location(base_models.BaseModel):
     latitude = models.DecimalField(max_digits=12, decimal_places=3)
     longitude = models.DecimalField(max_digits=12, decimal_places=3)
     elevation = models.DecimalField(max_digits=12, decimal_places=5, blank=True, null=True)
+    timezone = models.ForeignKey('TimeZone', models.DO_NOTHING)
 
 
 class LocationAddress(base_models.BaseModel):
@@ -178,6 +198,13 @@ class Terrain(base_models.BaseModel):
     """
     name = models.CharField(unique=True, max_length=50)
     description = models.CharField(max_length=255)
+
+
+class TimeZone(base_models.BaseModel):
+    timezone_id = models.CharField(max_length=200)
+    gmt_offset = models.DecimalField(3, 1)
+    dst_offset = models.DecimalField(3, 1)
+    raw_offset = models.DecimalField(3, 1)
 
 
 class Venue(base_models.BaseModel):
