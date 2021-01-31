@@ -6,6 +6,14 @@ class ActiveManager(models.Manager):
         return super().get_queryset().filter(deleted_at__isnull=False)
 
 
+class LookupModel(models.Model):
+    name = models.CharField(unique=True, max_length=50)
+    description = models.TextField()
+
+    class Meta:
+        abstract = True
+
+
 class BaseModel(models.Model):
     """
     A table for storing generic timestamp information about an object
